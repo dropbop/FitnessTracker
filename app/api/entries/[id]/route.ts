@@ -3,11 +3,11 @@ import { sql } from '@/lib/db';
 import { isAuthenticated } from '@/lib/auth';
 import { ExerciseEntry, UpdateEntryInput } from '@/lib/types';
 
-// Neon may return Date objects or ISO strings, normalize to YYYY-MM-DD
+// Neon may return Date objects or strings, normalize to YYYY-MM-DD
 function normalizeEntry(e: ExerciseEntry): ExerciseEntry {
   return {
     ...e,
-    exercise_date: String(e.exercise_date).substring(0, 10)
+    exercise_date: new Date(e.exercise_date).toISOString().substring(0, 10)
   };
 }
 
