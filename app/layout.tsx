@@ -51,25 +51,21 @@ export default function RootLayout({
             <nav className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-lg tracking-wider transition-colors"
+                className="text-lg tracking-wider transition-colors hover:text-[var(--color-accent)]"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   letterSpacing: '0.08em',
                 }}
-                onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
-                onMouseOut={(e) => e.currentTarget.style.color = 'var(--color-text)'}
               >
                 CALENDAR
               </Link>
               <Link
                 href="/stats"
-                className="text-lg tracking-wider transition-colors"
+                className="text-lg tracking-wider transition-colors hover:text-[var(--color-accent)]"
                 style={{
                   fontFamily: 'var(--font-heading)',
                   letterSpacing: '0.08em',
                 }}
-                onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
-                onMouseOut={(e) => e.currentTarget.style.color = 'var(--color-text)'}
               >
                 STATS
               </Link>
