@@ -8,7 +8,7 @@ import {
   format,
   getDay,
   startOfWeek,
-  differenceInWeeks,
+  addDays,
 } from 'date-fns';
 import { ExerciseEntry, ExerciseCategory } from '@/lib/types';
 
@@ -19,7 +19,11 @@ interface HeatmapProps {
 }
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const DAYS = ['Mon', '', 'Wed', '', 'Fri', '', ''];
+// Day labels - show only Mon, Wed, Fri to avoid crowding
+const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+
+const SQUARE_SIZE = 11;
+const SQUARE_GAP = 3;
 
 function getColorForCount(count: number, category: ExerciseCategory): string {
   if (count === 0) return '#1a1a1a';
@@ -53,61 +57,72 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
     return map;
   }, [entries, category]);
 
-  // Generate all days for the year
+  // Get the first day to display (Sunday of the week containing Jan 1)
+  const firstSunday = startOfWeek(yearStart, { weekStartsOn: 0 });
+
+  // Generate all days from first Sunday through end of year
   const allDays = useMemo(() => {
-    return eachDayOfInterval({ start: yearStart, end: yearEnd });
-  }, [yearStart, yearEnd]);
+    return eachDayOfInterval({ start: firstSunday, end: yearEnd });
+  }, [firstSunday, yearEnd]);
 
-  // Get the first Sunday of the year (or before if year doesn't start on Sunday)
-  const firstWeekStart = startOfWeek(yearStart, { weekStartsOn: 0 });
+  // Calculate total weeks
+  const totalWeeks = Math.ceil(allDays.length / 7);
 
-  // Calculate weeks
-  const weeks = useMemo(() => {
-    const weekMap: { weekIndex: number; day: Date; dayOfWeek: number }[] = [];
+  // Build the grid data: array of days in column-first order
+  // CSS Grid with grid-auto-flow: column will place them correctly
+  const gridDays = useMemo(() => {
+    const days: (Date | null)[] = [];
 
-    allDays.forEach((day) => {
-      const weekIndex = differenceInWeeks(startOfWeek(day, { weekStartsOn: 0 }), firstWeekStart);
-      const dayOfWeek = getDay(day); // 0 = Sunday, 6 = Saturday
-      weekMap.push({ weekIndex, day, dayOfWeek });
-    });
+    for (let weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+      for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+        const dayIndex = weekIndex * 7 + dayOfWeek;
+        const day = allDays[dayIndex];
 
-    return weekMap;
-  }, [allDays, firstWeekStart]);
-
-  // Find max week index
-  const maxWeek = Math.max(...weeks.map((w) => w.weekIndex));
-
-  // Build grid: weekIndex -> dayOfWeek -> day
-  const grid = useMemo(() => {
-    const g: (Date | null)[][] = Array.from({ length: maxWeek + 1 }, () =>
-      Array(7).fill(null)
-    );
-
-    weeks.forEach(({ weekIndex, day, dayOfWeek }) => {
-      g[weekIndex][dayOfWeek] = day;
-    });
-
-    return g;
-  }, [weeks, maxWeek]);
-
-  // Calculate month label positions
-  const monthLabels = useMemo(() => {
-    const labels: { month: string; weekIndex: number }[] = [];
-    let lastMonth = -1;
-
-    weeks.forEach(({ weekIndex, day }) => {
-      const month = day.getMonth();
-      if (month !== lastMonth) {
-        labels.push({ month: MONTHS[month], weekIndex });
-        lastMonth = month;
+        // Only include days that are in the target year
+        if (day && day.getFullYear() === year) {
+          days.push(day);
+        } else if (day && day < yearStart) {
+          // Days before Jan 1 - show as empty
+          days.push(null);
+        } else {
+          days.push(null);
+        }
       }
-    });
+    }
+
+    return days;
+  }, [allDays, totalWeeks, year, yearStart]);
+
+  // Calculate which week index each month starts at
+  const monthLabels = useMemo(() => {
+    const labels: (string | null)[] = Array(totalWeeks).fill(null);
+    let currentMonth = -1;
+
+    for (let weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
+      // Check the first day of this week that's in our year
+      for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
+        const dayIndex = weekIndex * 7 + dayOfWeek;
+        const day = allDays[dayIndex];
+
+        if (day && day.getFullYear() === year) {
+          const month = day.getMonth();
+          if (month !== currentMonth) {
+            labels[weekIndex] = MONTHS[month];
+            currentMonth = month;
+          }
+          break;
+        }
+      }
+    }
 
     return labels;
-  }, [weeks]);
+  }, [allDays, totalWeeks, year]);
 
   const categoryLabel = category === 'lifting' ? 'LIFTING' : 'CARDIO';
   const categoryColor = category === 'lifting' ? 'var(--color-lifting)' : 'var(--color-cardio)';
+
+  // Calculate grid dimensions for inline styles
+  const gridWidth = totalWeeks * SQUARE_SIZE + (totalWeeks - 1) * SQUARE_GAP;
 
   return (
     <div className="panel p-4">
@@ -118,84 +133,133 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
         {categoryLabel} - {year}
       </h3>
 
-      <div className="overflow-x-auto">
-        <div style={{ minWidth: '750px' }}>
+      <div className="overflow-x-auto pb-2">
+        {/* Main grid container */}
+        <div
+          style={{
+            display: 'inline-grid',
+            gridTemplateAreas: `"empty months" "days squares"`,
+            gridTemplateColumns: 'auto 1fr',
+            gap: '4px',
+          }}
+        >
+          {/* Empty top-left cell */}
+          <div style={{ gridArea: 'empty' }} />
+
           {/* Month labels */}
-          <div className="flex mb-1 ml-8">
-            {monthLabels.map((m, i) => (
-              <div
-                key={i}
-                className="text-xs"
-                style={{
-                  color: 'var(--color-text-muted)',
-                  position: 'absolute',
-                  left: `${m.weekIndex * 14 + 32}px`,
-                }}
-              >
-                {m.month}
+          <div
+            style={{
+              gridArea: 'months',
+              display: 'grid',
+              gridTemplateColumns: `repeat(${totalWeeks}, ${SQUARE_SIZE}px)`,
+              gap: `${SQUARE_GAP}px`,
+              fontSize: '10px',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            {monthLabels.map((label, i) => (
+              <div key={i} style={{ whiteSpace: 'nowrap', overflow: 'visible' }}>
+                {label || ''}
               </div>
             ))}
           </div>
 
-          <div className="flex mt-6">
-            {/* Day labels */}
-            <div className="flex flex-col gap-[2px] mr-2">
-              {DAYS.map((day, i) => (
+          {/* Day labels (Sun-Sat, but only show Mon, Wed, Fri) */}
+          <div
+            style={{
+              gridArea: 'days',
+              display: 'grid',
+              gridTemplateRows: `repeat(7, ${SQUARE_SIZE}px)`,
+              gap: `${SQUARE_GAP}px`,
+              fontSize: '10px',
+              color: 'var(--color-text-muted)',
+              paddingRight: '4px',
+            }}
+          >
+            {DAY_LABELS.map((label, i) => (
+              <div
+                key={i}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  height: `${SQUARE_SIZE}px`,
+                }}
+              >
+                {label}
+              </div>
+            ))}
+          </div>
+
+          {/* Squares grid - THE KEY: grid-auto-flow: column */}
+          <div
+            style={{
+              gridArea: 'squares',
+              display: 'grid',
+              gridAutoFlow: 'column',
+              gridAutoColumns: `${SQUARE_SIZE}px`,
+              gridTemplateRows: `repeat(7, ${SQUARE_SIZE}px)`,
+              gap: `${SQUARE_GAP}px`,
+            }}
+          >
+            {gridDays.map((day, i) => {
+              if (!day) {
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      width: SQUARE_SIZE,
+                      height: SQUARE_SIZE,
+                      background: 'transparent',
+                    }}
+                  />
+                );
+              }
+
+              const dateStr = format(day, 'yyyy-MM-dd');
+              const count = countByDate[dateStr] || 0;
+              const color = getColorForCount(count, category);
+
+              return (
                 <div
                   key={i}
-                  className="h-[12px] text-xs flex items-center justify-end pr-1"
-                  style={{ color: 'var(--color-text-muted)', width: '24px' }}
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Grid */}
-            <div className="flex gap-[2px]">
-              {grid.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col gap-[2px]">
-                  {week.map((day, dayIndex) => {
-                    if (!day) {
-                      return (
-                        <div
-                          key={dayIndex}
-                          className="w-[12px] h-[12px]"
-                          style={{ background: 'transparent' }}
-                        />
-                      );
-                    }
-
-                    const dateStr = format(day, 'yyyy-MM-dd');
-                    const count = countByDate[dateStr] || 0;
-                    const color = getColorForCount(count, category);
-
-                    return (
-                      <div
-                        key={dayIndex}
-                        className="w-[12px] h-[12px]"
-                        style={{ background: color }}
-                        title={`${format(day, 'MMM d, yyyy')}: ${count} ${category} ${count === 1 ? 'entry' : 'entries'}`}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
+                  style={{
+                    width: SQUARE_SIZE,
+                    height: SQUARE_SIZE,
+                    background: color,
+                    borderRadius: '2px',
+                  }}
+                  title={`${format(day, 'MMM d, yyyy')}: ${count} ${category} ${count === 1 ? 'entry' : 'entries'}`}
+                />
+              );
+            })}
           </div>
+        </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-2 mt-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
-            <span>Less</span>
-            {[0, 1, 2, 3, 4].map((level) => (
-              <div
-                key={level}
-                className="w-[12px] h-[12px]"
-                style={{ background: getColorForCount(level, category) }}
-              />
-            ))}
-            <span>More</span>
-          </div>
+        {/* Legend */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            marginTop: '12px',
+            fontSize: '11px',
+            color: 'var(--color-text-muted)',
+          }}
+        >
+          <span>Less</span>
+          {[0, 1, 2, 3, 4].map((level) => (
+            <div
+              key={level}
+              style={{
+                width: SQUARE_SIZE,
+                height: SQUARE_SIZE,
+                background: getColorForCount(level, category),
+                borderRadius: '2px',
+              }}
+            />
+          ))}
+          <span>More</span>
         </div>
       </div>
     </div>
