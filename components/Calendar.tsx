@@ -159,8 +159,10 @@ export default function Calendar() {
             hover:border-[var(--color-border-light)] hover:bg-[var(--color-surface-hover)]
           `}
           style={{
-            background: isToday ? 'rgba(204, 0, 0, 0.1)' : 'var(--color-surface)',
-            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
+            background: isToday ? 'rgba(204, 0, 0, 0.1)' : '#111111',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(255,255,255,0.03)',
+            borderTopColor: isToday ? undefined : '#0a0a0a',
+            borderBottomColor: isToday ? undefined : '#2a2a2a',
           }}
         >
           <span
