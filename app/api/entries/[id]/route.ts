@@ -3,13 +3,11 @@ import { sql } from '@/lib/db';
 import { isAuthenticated } from '@/lib/auth';
 import { ExerciseEntry, UpdateEntryInput } from '@/lib/types';
 
-// Neon returns dates as ISO timestamps, normalize to YYYY-MM-DD
+// Neon may return Date objects or ISO strings, normalize to YYYY-MM-DD
 function normalizeEntry(e: ExerciseEntry): ExerciseEntry {
   return {
     ...e,
-    exercise_date: typeof e.exercise_date === 'string' && e.exercise_date.length > 10
-      ? e.exercise_date.substring(0, 10)
-      : e.exercise_date
+    exercise_date: String(e.exercise_date).substring(0, 10)
   };
 }
 
