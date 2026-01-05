@@ -1,54 +1,46 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { format } from 'date-fns';
 import { ExerciseEntry } from '@/lib/types';
 import { CloseIcon, EditIcon, DeleteIcon, PlusIcon, LiftingIcon, CardioIcon } from './Icons';
 import EntryForm from './EntryForm';
 
+type AppMode = 'demo' | 'real';
+
 interface DayModalProps {
   date: Date;
-  isAuthenticated: boolean;
+  mode: AppMode;
+  entries: ExerciseEntry[];
   onClose: () => void;
   onAuthRequired: () => void;
   onEntriesChanged: () => void;
+  onDemoAdd: (entry: Omit<ExerciseEntry, 'id' | 'created_at'>) => ExerciseEntry;
+  onDemoUpdate: (id: number, updates: Partial<ExerciseEntry>) => void;
+  onDemoDelete: (id: number) => void;
 }
 
 export default function DayModal({
   date,
-  isAuthenticated,
+  mode,
+  entries,
   onClose,
   onAuthRequired,
   onEntriesChanged,
+  onDemoAdd,
+  onDemoUpdate,
+  onDemoDelete,
 }: DayModalProps) {
-  const [entries, setEntries] = useState<ExerciseEntry[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ExerciseEntry | null>(null);
 
   const dateStr = format(date, 'yyyy-MM-dd');
   const displayDate = format(date, 'EEEE, MMMM d, yyyy');
 
-  useEffect(() => {
-    fetchEntries();
-  }, [dateStr]);
-
-  const fetchEntries = async () => {
-    try {
-      const res = await fetch(`/api/entries?date=${dateStr}`);
-      if (res.ok) {
-        const data = await res.json();
-        setEntries(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch entries:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAddClick = () => {
-    if (!isAuthenticated) {
+    // In demo mode, anyone can add
+    // In real mode, need auth
+    if (mode === 'real') {
       onAuthRequired();
       return;
     }
@@ -57,7 +49,7 @@ export default function DayModal({
   };
 
   const handleEditClick = (entry: ExerciseEntry) => {
-    if (!isAuthenticated) {
+    if (mode === 'real') {
       onAuthRequired();
       return;
     }
@@ -66,33 +58,40 @@ export default function DayModal({
   };
 
   const handleDeleteClick = async (entry: ExerciseEntry) => {
-    if (!isAuthenticated) {
+    if (mode === 'real') {
       onAuthRequired();
       return;
     }
 
+    // Demo mode - delete from state
     if (!confirm('Delete this entry?')) return;
-
-    try {
-      const res = await fetch(`/api/entries/${entry.id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setEntries(entries.filter((e) => e.id !== entry.id));
-        onEntriesChanged();
-      }
-    } catch (error) {
-      console.error('Failed to delete:', error);
-    }
+    onDemoDelete(entry.id);
   };
 
   const handleSave = (savedEntry: ExerciseEntry) => {
+    // This is called from EntryForm after a successful save
+    // In demo mode, we handle it here; in real mode, EntryForm handles API
+    setShowForm(false);
+    setEditingEntry(null);
+    if (mode === 'real') {
+      onEntriesChanged();
+    }
+  };
+
+  const handleDemoSave = (formData: {
+    exercise_date: string;
+    category: 'lifting' | 'cardio';
+    sub_exercise: string;
+    notes_quantitative: string | null;
+    notes_qualitative: string | null;
+  }) => {
     if (editingEntry) {
-      setEntries(entries.map((e) => (e.id === savedEntry.id ? savedEntry : e)));
+      onDemoUpdate(editingEntry.id, formData);
     } else {
-      setEntries([savedEntry, ...entries]);
+      onDemoAdd(formData);
     }
     setShowForm(false);
     setEditingEntry(null);
-    onEntriesChanged();
   };
 
   return (
@@ -115,7 +114,9 @@ export default function DayModal({
           <EntryForm
             date={dateStr}
             entry={editingEntry || undefined}
+            mode={mode}
             onSave={handleSave}
+            onDemoSave={handleDemoSave}
             onCancel={() => {
               setShowForm(false);
               setEditingEntry(null);
@@ -123,9 +124,7 @@ export default function DayModal({
           />
         ) : (
           <>
-            {loading ? (
-              <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-            ) : entries.length === 0 ? (
+            {entries.length === 0 ? (
               <p style={{ color: 'var(--color-text-muted)' }} className="mb-4">
                 No entries for this day.
               </p>
@@ -163,7 +162,8 @@ export default function DayModal({
                           </p>
                         )}
                       </div>
-                      {isAuthenticated && (
+                      {/* Show edit/delete in demo mode (anyone) or in real mode if authenticated */}
+                      {mode === 'demo' && (
                         <div className="flex gap-1 flex-shrink-0">
                           <button
                             onClick={() => handleEditClick(entry)}
@@ -174,6 +174,37 @@ export default function DayModal({
                           </button>
                           <button
                             onClick={() => handleDeleteClick(entry)}
+                            className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
+                            title="Delete"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </div>
+                      )}
+                      {mode === 'real' && (
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => {
+                              setEditingEntry(entry);
+                              setShowForm(true);
+                            }}
+                            className="p-1 hover:text-[var(--color-accent-yellow)] transition-colors"
+                            title="Edit"
+                          >
+                            <EditIcon />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              if (!confirm('Delete this entry?')) return;
+                              try {
+                                const res = await fetch(`/api/entries/${entry.id}`, { method: 'DELETE' });
+                                if (res.ok) {
+                                  onEntriesChanged();
+                                }
+                              } catch (error) {
+                                console.error('Failed to delete:', error);
+                              }
+                            }}
                             className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
                             title="Delete"
                           >

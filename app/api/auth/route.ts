@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyPassword, getAuthCookieValue, AUTH_COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/auth';
+import { verifyCredentials, getAuthCookieValue, AUTH_COOKIE_NAME, COOKIE_MAX_AGE } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { password } = await request.json();
+    const { username, password } = await request.json();
+
+    if (!username || typeof username !== 'string') {
+      return NextResponse.json({ error: 'Username required' }, { status: 400 });
+    }
 
     if (!password || typeof password !== 'string') {
       return NextResponse.json({ error: 'Password required' }, { status: 400 });
     }
 
-    if (!verifyPassword(password)) {
-      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
+    if (!verifyCredentials(username, password)) {
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     const response = NextResponse.json({ success: true });

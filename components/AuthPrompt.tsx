@@ -9,6 +9,7 @@ interface AuthPromptProps {
 }
 
 export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,13 +23,13 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username, password }),
       });
 
       if (res.ok) {
         onSuccess();
       } else {
-        setError('Invalid password');
+        setError('Invalid credentials');
       }
     } catch {
       setError('Connection error');
@@ -43,7 +44,7 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
       <div className="modal-content panel p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl" style={{ color: 'var(--color-accent-yellow)' }}>
-            Enter Password
+            Login
           </h2>
           <button
             onClick={onClose}
@@ -55,12 +56,22 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
 
         <form onSubmit={handleSubmit}>
           <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Username"
+            className="mb-3"
+            autoFocus
+            autoComplete="username"
+          />
+
+          <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             className="mb-4"
-            autoFocus
+            autoComplete="current-password"
           />
 
           {error && (
@@ -72,7 +83,7 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
             disabled={loading}
             className="btn btn-primary w-full"
           >
-            {loading ? 'Checking...' : 'Unlock'}
+            {loading ? 'Checking...' : 'Login'}
           </button>
         </form>
       </div>

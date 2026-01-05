@@ -15,18 +15,22 @@ import {
   isSameDay,
 } from 'date-fns';
 import { ExerciseEntry } from '@/lib/types';
+import { getInitialDemoEntries, getNextDemoId } from '@/lib/demoData';
 import { ChevronLeftIcon, ChevronRightIcon, LiftingIcon, CardioIcon } from './Icons';
 import DayModal from './DayModal';
 import AuthPrompt from './AuthPrompt';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+type AppMode = 'demo' | 'real';
+
 export default function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(() => new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mode, setMode] = useState<AppMode>('demo');
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [entries, setEntries] = useState<ExerciseEntry[]>([]);
+  const [demoEntries, setDemoEntries] = useState<ExerciseEntry[]>(() => getInitialDemoEntries());
   const [today, setToday] = useState<Date | null>(null);
 
   // Set today on client side only (for correct timezone)
@@ -39,18 +43,20 @@ export default function Calendar() {
     checkAuth();
   }, []);
 
-  // Fetch entries when month changes
+  // Fetch entries when month changes (only in real mode)
   useEffect(() => {
-    fetchMonthEntries();
-  }, [currentMonth]);
+    if (mode === 'real') {
+      fetchMonthEntries();
+    }
+  }, [currentMonth, mode]);
 
   const checkAuth = async () => {
     try {
       const res = await fetch('/api/auth/check');
       const data = await res.json();
-      setIsAuthenticated(data.authenticated);
+      setMode(data.mode as AppMode);
     } catch {
-      setIsAuthenticated(false);
+      setMode('demo');
     }
   };
 
@@ -84,9 +90,45 @@ export default function Calendar() {
     preventScrollOnSwipe: true,
   });
 
+  // Get the appropriate entries based on mode
+  const activeEntries = mode === 'demo' ? demoEntries : entries;
+
   const getEntriesForDate = (date: Date) => {
     const dateStr = format(date, 'yyyy-MM-dd');
-    return entries.filter((e) => e.exercise_date === dateStr);
+    return activeEntries.filter((e) => e.exercise_date === dateStr);
+  };
+
+  // Demo mode CRUD handlers
+  const handleDemoAdd = (entry: Omit<ExerciseEntry, 'id' | 'created_at'>) => {
+    const newEntry: ExerciseEntry = {
+      ...entry,
+      id: getNextDemoId(),
+      created_at: new Date().toISOString(),
+    };
+    setDemoEntries((prev) => [newEntry, ...prev]);
+    return newEntry;
+  };
+
+  const handleDemoUpdate = (id: number, updates: Partial<ExerciseEntry>) => {
+    setDemoEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
+  };
+
+  const handleDemoDelete = (id: number) => {
+    setDemoEntries((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  const handleLogout = async () => {
+    await fetch('/api/auth', { method: 'DELETE' });
+    setMode('demo');
+    setEntries([]);
+  };
+
+  const handleLoginSuccess = () => {
+    setMode('real');
+    setShowAuthPrompt(false);
+    fetchMonthEntries();
   };
 
   const renderCalendarDays = () => {
@@ -146,6 +188,21 @@ export default function Calendar() {
 
   return (
     <div {...swipeHandlers}>
+      {/* Demo Mode Banner */}
+      {mode === 'demo' && (
+        <div
+          className="mb-4 p-3 text-center border-2"
+          style={{
+            background: 'var(--color-surface)',
+            borderColor: 'var(--color-accent-orange)',
+            color: 'var(--color-accent-orange)',
+            fontFamily: 'var(--font-heading)',
+          }}
+        >
+          DEMO MODE - Changes are not saved
+        </div>
+      )}
+
       {/* Month Navigation */}
       <div className="flex items-center justify-between mb-6">
         <button
@@ -172,12 +229,9 @@ export default function Calendar() {
 
       {/* Auth Status */}
       <div className="flex justify-end mb-4">
-        {isAuthenticated ? (
+        {mode === 'real' ? (
           <button
-            onClick={async () => {
-              await fetch('/api/auth', { method: 'DELETE' });
-              setIsAuthenticated(false);
-            }}
+            onClick={handleLogout}
             className="text-sm hover:text-[var(--color-accent-red)] transition-colors"
             style={{ color: 'var(--color-text-muted)' }}
           >
@@ -189,7 +243,7 @@ export default function Calendar() {
             className="text-sm hover:text-[var(--color-accent-yellow)] transition-colors"
             style={{ color: 'var(--color-text-muted)' }}
           >
-            Login to Edit
+            Login
           </button>
         )}
       </div>
@@ -226,20 +280,21 @@ export default function Calendar() {
       {selectedDate && (
         <DayModal
           date={selectedDate}
-          isAuthenticated={isAuthenticated}
+          mode={mode}
+          entries={getEntriesForDate(selectedDate)}
           onClose={() => setSelectedDate(null)}
           onAuthRequired={() => setShowAuthPrompt(true)}
           onEntriesChanged={fetchMonthEntries}
+          onDemoAdd={handleDemoAdd}
+          onDemoUpdate={handleDemoUpdate}
+          onDemoDelete={handleDemoDelete}
         />
       )}
 
       {/* Auth Prompt */}
       {showAuthPrompt && (
         <AuthPrompt
-          onSuccess={() => {
-            setIsAuthenticated(true);
-            setShowAuthPrompt(false);
-          }}
+          onSuccess={handleLoginSuccess}
           onClose={() => setShowAuthPrompt(false)}
         />
       )}

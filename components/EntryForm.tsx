@@ -3,14 +3,31 @@
 import { useState } from 'react';
 import { ExerciseEntry, CreateEntryInput, ExerciseCategory } from '@/lib/types';
 
+type AppMode = 'demo' | 'real';
+
 interface EntryFormProps {
   date: string;
   entry?: ExerciseEntry;
+  mode: AppMode;
   onSave: (entry: ExerciseEntry) => void;
+  onDemoSave: (formData: {
+    exercise_date: string;
+    category: ExerciseCategory;
+    sub_exercise: string;
+    notes_quantitative: string | null;
+    notes_qualitative: string | null;
+  }) => void;
   onCancel: () => void;
 }
 
-export default function EntryForm({ date, entry, onSave, onCancel }: EntryFormProps) {
+export default function EntryForm({
+  date,
+  entry,
+  mode,
+  onSave,
+  onDemoSave,
+  onCancel,
+}: EntryFormProps) {
   const [category, setCategory] = useState<ExerciseCategory>(entry?.category || 'lifting');
   const [subExercise, setSubExercise] = useState(entry?.sub_exercise || '');
   const [notesQuantitative, setNotesQuantitative] = useState(entry?.notes_quantitative || '');
@@ -27,16 +44,26 @@ export default function EntryForm({ date, entry, onSave, onCancel }: EntryFormPr
     }
 
     setError('');
+
+    const formData = {
+      exercise_date: date,
+      category,
+      sub_exercise: subExercise.trim(),
+      notes_quantitative: notesQuantitative.trim() || null,
+      notes_qualitative: notesQualitative.trim() || null,
+    };
+
+    // Demo mode - just call the callback, no API
+    if (mode === 'demo') {
+      onDemoSave(formData);
+      return;
+    }
+
+    // Real mode - call API
     setLoading(true);
 
     try {
-      const body: CreateEntryInput = {
-        exercise_date: date,
-        category,
-        sub_exercise: subExercise.trim(),
-        notes_quantitative: notesQuantitative.trim() || null,
-        notes_qualitative: notesQualitative.trim() || null,
-      };
+      const body: CreateEntryInput = formData;
 
       const url = entry ? `/api/entries/${entry.id}` : '/api/entries';
       const method = entry ? 'PUT' : 'POST';

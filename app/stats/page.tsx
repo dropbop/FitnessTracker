@@ -2,27 +2,44 @@
 
 import { useState, useEffect } from 'react';
 import { ExerciseEntry } from '@/lib/types';
+import { DEMO_ENTRIES } from '@/lib/demoData';
 import Heatmap from '@/components/Heatmap';
 
 const YEAR = 2026;
 
+type AppMode = 'demo' | 'real';
+
 export default function StatsPage() {
+  const [mode, setMode] = useState<AppMode>('demo');
   const [entries, setEntries] = useState<ExerciseEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchYearEntries();
+    checkAuthAndFetch();
   }, []);
 
-  const fetchYearEntries = async () => {
+  const checkAuthAndFetch = async () => {
     try {
-      const res = await fetch(`/api/entries?year=${YEAR}`);
-      if (res.ok) {
-        const data = await res.json();
-        setEntries(data);
+      const authRes = await fetch('/api/auth/check');
+      const authData = await authRes.json();
+      const currentMode = authData.mode as AppMode;
+      setMode(currentMode);
+
+      if (currentMode === 'real') {
+        const entriesRes = await fetch(`/api/entries?year=${YEAR}`);
+        if (entriesRes.ok) {
+          const data = await entriesRes.json();
+          setEntries(data);
+        }
+      } else {
+        // Demo mode - use demo entries
+        setEntries(DEMO_ENTRIES);
       }
     } catch (error) {
-      console.error('Failed to fetch entries:', error);
+      console.error('Failed to fetch:', error);
+      // Fall back to demo mode
+      setMode('demo');
+      setEntries(DEMO_ENTRIES);
     } finally {
       setLoading(false);
     }
@@ -33,6 +50,21 @@ export default function StatsPage() {
 
   return (
     <div>
+      {/* Demo Mode Banner */}
+      {mode === 'demo' && (
+        <div
+          className="mb-4 p-3 text-center border-2"
+          style={{
+            background: 'var(--color-surface)',
+            borderColor: 'var(--color-accent-orange)',
+            color: 'var(--color-accent-orange)',
+            fontFamily: 'var(--font-heading)',
+          }}
+        >
+          DEMO MODE - Showing sample data
+        </div>
+      )}
+
       <h1
         className="text-2xl md:text-3xl mb-6"
         style={{ color: 'var(--color-accent-yellow)' }}
