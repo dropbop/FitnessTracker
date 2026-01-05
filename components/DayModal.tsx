@@ -38,34 +38,31 @@ export default function DayModal({
   const displayDate = format(date, 'EEEE, MMMM d, yyyy');
 
   const handleAddClick = () => {
-    // In demo mode, anyone can add
-    // In real mode, need auth
-    if (mode === 'real') {
-      onAuthRequired();
-      return;
-    }
     setEditingEntry(null);
     setShowForm(true);
   };
 
   const handleEditClick = (entry: ExerciseEntry) => {
-    if (mode === 'real') {
-      onAuthRequired();
-      return;
-    }
     setEditingEntry(entry);
     setShowForm(true);
   };
 
   const handleDeleteClick = async (entry: ExerciseEntry) => {
-    if (mode === 'real') {
-      onAuthRequired();
-      return;
-    }
-
-    // Demo mode - delete from state
     if (!confirm('Delete this entry?')) return;
-    onDemoDelete(entry.id);
+
+    if (mode === 'demo') {
+      onDemoDelete(entry.id);
+    } else {
+      // Real mode - call API
+      try {
+        const res = await fetch(`/api/entries/${entry.id}`, { method: 'DELETE' });
+        if (res.ok) {
+          onEntriesChanged();
+        }
+      } catch (error) {
+        console.error('Failed to delete:', error);
+      }
+    }
   };
 
   const handleSave = (savedEntry: ExerciseEntry) => {
@@ -162,56 +159,23 @@ export default function DayModal({
                           </p>
                         )}
                       </div>
-                      {/* Show edit/delete in demo mode (anyone) or in real mode if authenticated */}
-                      {mode === 'demo' && (
-                        <div className="flex gap-1 flex-shrink-0">
-                          <button
-                            onClick={() => handleEditClick(entry)}
-                            className="p-1 hover:text-[var(--color-accent-yellow)] transition-colors"
-                            title="Edit"
-                          >
-                            <EditIcon />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteClick(entry)}
-                            className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
-                            title="Delete"
-                          >
-                            <DeleteIcon />
-                          </button>
-                        </div>
-                      )}
-                      {mode === 'real' && (
-                        <div className="flex gap-1 flex-shrink-0">
-                          <button
-                            onClick={() => {
-                              setEditingEntry(entry);
-                              setShowForm(true);
-                            }}
-                            className="p-1 hover:text-[var(--color-accent-yellow)] transition-colors"
-                            title="Edit"
-                          >
-                            <EditIcon />
-                          </button>
-                          <button
-                            onClick={async () => {
-                              if (!confirm('Delete this entry?')) return;
-                              try {
-                                const res = await fetch(`/api/entries/${entry.id}`, { method: 'DELETE' });
-                                if (res.ok) {
-                                  onEntriesChanged();
-                                }
-                              } catch (error) {
-                                console.error('Failed to delete:', error);
-                              }
-                            }}
-                            className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
-                            title="Delete"
-                          >
-                            <DeleteIcon />
-                          </button>
-                        </div>
-                      )}
+                      {/* Edit/delete buttons - same for both modes */}
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => handleEditClick(entry)}
+                          className="p-1 hover:text-[var(--color-accent-yellow)] transition-colors"
+                          title="Edit"
+                        >
+                          <EditIcon />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(entry)}
+                          className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
+                          title="Delete"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
