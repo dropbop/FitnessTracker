@@ -3,6 +3,16 @@ import { sql } from '@/lib/db';
 import { isAuthenticated } from '@/lib/auth';
 import { ExerciseEntry, CreateEntryInput } from '@/lib/types';
 
+// Neon returns dates as ISO timestamps, normalize to YYYY-MM-DD
+function normalizeEntries(entries: ExerciseEntry[]): ExerciseEntry[] {
+  return entries.map(e => ({
+    ...e,
+    exercise_date: typeof e.exercise_date === 'string' && e.exercise_date.length > 10
+      ? e.exercise_date.substring(0, 10)
+      : e.exercise_date
+  }));
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -52,7 +62,7 @@ export async function GET(request: NextRequest) {
       ` as ExerciseEntry[];
     }
 
-    return NextResponse.json(entries);
+    return NextResponse.json(normalizeEntries(entries));
   } catch (error) {
     console.error('Error fetching entries:', error);
     return NextResponse.json({ error: 'Failed to fetch entries' }, { status: 500 });
@@ -83,7 +93,7 @@ export async function POST(request: NextRequest) {
       RETURNING id, exercise_date, category, sub_exercise, notes_quantitative, notes_qualitative, created_at
     ` as ExerciseEntry[];
 
-    return NextResponse.json(result[0], { status: 201 });
+    return NextResponse.json(normalizeEntries(result)[0], { status: 201 });
   } catch (error) {
     console.error('Error creating entry:', error);
     return NextResponse.json({ error: 'Failed to create entry' }, { status: 500 });

@@ -3,6 +3,16 @@ import { sql } from '@/lib/db';
 import { isAuthenticated } from '@/lib/auth';
 import { ExerciseEntry, UpdateEntryInput } from '@/lib/types';
 
+// Neon returns dates as ISO timestamps, normalize to YYYY-MM-DD
+function normalizeEntry(e: ExerciseEntry): ExerciseEntry {
+  return {
+    ...e,
+    exercise_date: typeof e.exercise_date === 'string' && e.exercise_date.length > 10
+      ? e.exercise_date.substring(0, 10)
+      : e.exercise_date
+  };
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -43,7 +53,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Entry not found' }, { status: 404 });
     }
 
-    return NextResponse.json(result[0]);
+    return NextResponse.json(normalizeEntry(result[0]));
   } catch (error) {
     console.error('Error updating entry:', error);
     return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
