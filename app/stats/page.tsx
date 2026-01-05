@@ -52,24 +52,16 @@ export default function StatsPage() {
     <div>
       {/* Demo Mode Banner */}
       {mode === 'demo' && (
-        <div
-          className="mb-4 p-3 text-center border-2"
-          style={{
-            background: 'var(--color-surface)',
-            borderColor: 'var(--color-accent-orange)',
-            color: 'var(--color-accent-orange)',
-            fontFamily: 'var(--font-heading)',
-          }}
-        >
-          DEMO MODE - Showing sample data
+        <div className="demo-banner mb-4 p-3 text-center">
+          DEMO MODE — SHOWING SAMPLE DATA
         </div>
       )}
 
       <h1
-        className="text-2xl md:text-3xl mb-6"
-        style={{ color: 'var(--color-accent-yellow)' }}
+        className="text-3xl md:text-4xl mb-6"
+        style={{ color: 'var(--color-accent)', letterSpacing: '0.08em' }}
       >
-        {YEAR} Stats
+        {YEAR} STATS
       </h1>
 
       {loading ? (
@@ -78,23 +70,33 @@ export default function StatsPage() {
         <>
           {/* Summary */}
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="panel p-4 text-center">
+            <div className="panel p-4 text-center" style={{ borderTop: '3px solid #cc0000' }}>
               <div
-                className="text-3xl font-bold"
-                style={{ color: 'var(--color-lifting)', fontFamily: 'var(--font-heading)' }}
+                className="text-4xl"
+                style={{ color: '#cc0000', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
               >
                 {liftingCount}
               </div>
-              <div style={{ color: 'var(--color-text-muted)' }}>Lifting Entries</div>
-            </div>
-            <div className="panel p-4 text-center">
               <div
-                className="text-3xl font-bold"
-                style={{ color: 'var(--color-cardio)', fontFamily: 'var(--font-heading)' }}
+                className="uppercase tracking-wider text-sm mt-1"
+                style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+              >
+                Lifting Entries
+              </div>
+            </div>
+            <div className="panel p-4 text-center" style={{ borderTop: '3px solid #ffcc00' }}>
+              <div
+                className="text-4xl"
+                style={{ color: '#ffcc00', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
               >
                 {cardioCount}
               </div>
-              <div style={{ color: 'var(--color-text-muted)' }}>Cardio Entries</div>
+              <div
+                className="uppercase tracking-wider text-sm mt-1"
+                style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+              >
+                Cardio Entries
+              </div>
             </div>
           </div>
 

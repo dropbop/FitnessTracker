@@ -155,17 +155,20 @@ export default function Calendar() {
           className={`
             relative p-2 min-h-[60px] md:min-h-[80px] border-2 transition-colors
             ${isCurrentMonth ? '' : 'opacity-30'}
-            ${isToday ? 'border-[var(--color-accent-yellow)]' : 'border-[var(--color-border)]'}
+            ${isToday ? 'border-[var(--color-accent)]' : 'border-[var(--color-border)]'}
             hover:border-[var(--color-border-light)] hover:bg-[var(--color-surface-hover)]
           `}
-          style={{ background: 'var(--color-surface)' }}
+          style={{
+            background: isToday ? 'rgba(204, 0, 0, 0.1)' : 'var(--color-surface)',
+            boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
+          }}
         >
           <span
             className={`
-              absolute top-1 left-2 text-sm font-bold
-              ${isToday ? 'text-[var(--color-accent-yellow)]' : ''}
+              absolute top-1 left-2 text-sm
+              ${isToday ? 'text-[var(--color-accent)]' : ''}
             `}
-            style={{ fontFamily: 'var(--font-heading)' }}
+            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
           >
             {format(day, 'd')}
           </span>
@@ -191,15 +194,9 @@ export default function Calendar() {
       {/* Demo Mode Banner */}
       {mode === 'demo' && (
         <div
-          className="mb-4 p-3 text-center border-2"
-          style={{
-            background: 'var(--color-surface)',
-            borderColor: 'var(--color-accent-orange)',
-            color: 'var(--color-accent-orange)',
-            fontFamily: 'var(--font-heading)',
-          }}
+          className="demo-banner mb-4 p-3 text-center"
         >
-          DEMO MODE - Changes are not saved
+          DEMO MODE — CHANGES NOT SAVED
         </div>
       )}
 
@@ -213,10 +210,10 @@ export default function Calendar() {
           <ChevronLeftIcon className="text-xl" />
         </button>
         <h1
-          className="text-2xl md:text-3xl"
-          style={{ color: 'var(--color-accent-yellow)' }}
+          className="text-3xl md:text-4xl"
+          style={{ color: 'var(--color-accent)', letterSpacing: '0.08em' }}
         >
-          {format(currentMonth, 'MMMM yyyy')}
+          {format(currentMonth, 'MMMM yyyy').toUpperCase()}
         </h1>
         <button
           onClick={goToNextMonth}
@@ -232,16 +229,16 @@ export default function Calendar() {
         {mode === 'real' ? (
           <button
             onClick={handleLogout}
-            className="text-sm hover:text-[var(--color-accent-red)] transition-colors"
-            style={{ color: 'var(--color-text-muted)' }}
+            className="text-sm hover:text-[var(--color-accent)] transition-colors uppercase tracking-wider"
+            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
           >
             Logout
           </button>
         ) : (
           <button
             onClick={() => setShowAuthPrompt(true)}
-            className="text-sm hover:text-[var(--color-accent-yellow)] transition-colors"
-            style={{ color: 'var(--color-text-muted)' }}
+            className="text-sm hover:text-[var(--color-accent)] transition-colors uppercase tracking-wider"
+            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
           >
             Login
           </button>
@@ -253,10 +250,15 @@ export default function Calendar() {
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="text-center text-sm py-2 font-bold"
-            style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-text-muted)' }}
+            className="text-center py-2"
+            style={{
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--color-text-muted)',
+              letterSpacing: '0.1em',
+              fontSize: '0.9rem',
+            }}
           >
-            {day}
+            {day.toUpperCase()}
           </div>
         ))}
       </div>
@@ -265,14 +267,14 @@ export default function Calendar() {
       <div className="grid grid-cols-7 gap-1">{renderCalendarDays()}</div>
 
       {/* Legend */}
-      <div className="flex gap-6 mt-6 justify-center text-sm">
+      <div className="flex gap-8 mt-6 justify-center">
         <div className="flex items-center gap-2">
-          <LiftingIcon className="text-lg text-[var(--color-lifting)]" />
-          <span>Lifting</span>
+          <LiftingIcon className="text-xl text-[var(--color-lifting)]" />
+          <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>LIFTING</span>
         </div>
         <div className="flex items-center gap-2">
-          <CardioIcon className="text-lg text-[var(--color-cardio)]" />
-          <span>Cardio</span>
+          <CardioIcon className="text-xl text-[var(--color-cardio)]" />
+          <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>CARDIO</span>
         </div>
       </div>
 

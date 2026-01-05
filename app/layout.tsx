@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Oswald, Roboto_Condensed } from "next/font/google";
+import { Bebas_Neue, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 
-const oswald = Oswald({
+const bebasNeue = Bebas_Neue({
   variable: "--font-heading",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400"],
 });
 
 const robotoCondensed = Roboto_Condensed({
@@ -16,7 +16,7 @@ const robotoCondensed = Roboto_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "FitnessTracker",
+  title: "FITNESSTRACKER",
   description: "Track your lifting and cardio workouts",
 };
 
@@ -27,28 +27,51 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${oswald.variable} ${robotoCondensed.variable}`}>
-        <header className="panel border-b-2 border-t-0 border-x-0" style={{ borderColor: 'var(--color-border)' }}>
+      <body className={`${bebasNeue.variable} ${robotoCondensed.variable}`}>
+        <header
+          className="border-b-4"
+          style={{
+            background: 'var(--color-surface)',
+            borderColor: 'var(--color-accent)',
+          }}
+        >
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
-              <span className="text-2xl font-bold tracking-wide" style={{ fontFamily: 'var(--font-heading)', color: 'var(--color-accent-yellow)' }}>
+              <span
+                className="text-3xl tracking-wider"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--color-accent)',
+                  letterSpacing: '0.1em',
+                }}
+              >
                 FITNESSTRACKER
               </span>
             </Link>
-            <nav className="flex items-center gap-4">
+            <nav className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm uppercase tracking-wider hover:text-[var(--color-accent-yellow)] transition-colors"
-                style={{ fontFamily: 'var(--font-heading)' }}
+                className="text-lg tracking-wider transition-colors"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  letterSpacing: '0.08em',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--color-text)'}
               >
-                Calendar
+                CALENDAR
               </Link>
               <Link
                 href="/stats"
-                className="text-sm uppercase tracking-wider hover:text-[var(--color-accent-yellow)] transition-colors"
-                style={{ fontFamily: 'var(--font-heading)' }}
+                className="text-lg tracking-wider transition-colors"
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  letterSpacing: '0.08em',
+                }}
+                onMouseOver={(e) => e.currentTarget.style.color = 'var(--color-accent)'}
+                onMouseOut={(e) => e.currentTarget.style.color = 'var(--color-text)'}
               >
-                Stats
+                STATS
               </Link>
             </nav>
           </div>

@@ -43,39 +43,51 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
       <div className="modal-backdrop" onClick={onClose} />
       <div className="modal-content panel p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl" style={{ color: 'var(--color-accent-yellow)' }}>
-            Login
+          <h2 className="text-2xl" style={{ color: 'var(--color-accent)', letterSpacing: '0.1em' }}>
+            LOGIN
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
+            className="p-2 hover:text-[var(--color-accent)] transition-colors"
           >
             <CloseIcon className="text-xl" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-            className="mb-3"
-            autoFocus
-            autoComplete="username"
-          />
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label
+              className="block text-sm mb-1 uppercase tracking-wider"
+              style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+            >
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoFocus
+              autoComplete="username"
+            />
+          </div>
 
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="mb-4"
-            autoComplete="current-password"
-          />
+          <div>
+            <label
+              className="block text-sm mb-1 uppercase tracking-wider"
+              style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+            >
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+          </div>
 
           {error && (
-            <p className="text-[var(--color-accent-red)] mb-4 text-sm">{error}</p>
+            <p className="text-[var(--color-accent)] text-sm">{error}</p>
           )}
 
           <button
@@ -83,7 +95,7 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
             disabled={loading}
             className="btn btn-primary w-full"
           >
-            {loading ? 'Checking...' : 'Login'}
+            {loading ? 'CHECKING...' : 'LOGIN'}
           </button>
         </form>
       </div>

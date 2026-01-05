@@ -29,15 +29,17 @@ function getColorForCount(count: number, category: ExerciseCategory): string {
   if (count === 0) return '#1a1a1a';
 
   if (category === 'lifting') {
-    if (count === 1) return '#1e3a5f';
-    if (count === 2) return '#1d4ed8';
-    if (count === 3) return '#2563eb';
-    return '#3b82f6';
+    // Red shades for lifting
+    if (count === 1) return '#4a0000';
+    if (count === 2) return '#7a0000';
+    if (count === 3) return '#aa0000';
+    return '#cc0000';
   } else {
-    if (count === 1) return '#14532d';
-    if (count === 2) return '#15803d';
-    if (count === 3) return '#16a34a';
-    return '#22c55e';
+    // Yellow/gold shades for cardio
+    if (count === 1) return '#4a3d00';
+    if (count === 2) return '#7a6600';
+    if (count === 3) return '#b38f00';
+    return '#ffcc00';
   }
 }
 
@@ -119,18 +121,18 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
   }, [allDays, totalWeeks, year]);
 
   const categoryLabel = category === 'lifting' ? 'LIFTING' : 'CARDIO';
-  const categoryColor = category === 'lifting' ? 'var(--color-lifting)' : 'var(--color-cardio)';
+  const categoryColor = category === 'lifting' ? '#cc0000' : '#ffcc00';
 
   // Calculate grid dimensions for inline styles
   const gridWidth = totalWeeks * SQUARE_SIZE + (totalWeeks - 1) * SQUARE_GAP;
 
   return (
-    <div className="panel p-4">
+    <div className="panel p-4" style={{ borderTop: `3px solid ${categoryColor}` }}>
       <h3
-        className="text-lg mb-4"
-        style={{ fontFamily: 'var(--font-heading)', color: categoryColor }}
+        className="text-xl mb-4"
+        style={{ fontFamily: 'var(--font-heading)', color: categoryColor, letterSpacing: '0.1em' }}
       >
-        {categoryLabel} - {year}
+        {categoryLabel} — {year}
       </h3>
 
       <div className="overflow-x-auto pb-2">

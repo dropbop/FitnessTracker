@@ -92,7 +92,10 @@ export default function EntryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm mb-1" style={{ color: 'var(--color-text-muted)' }}>
+        <label
+          className="block text-sm mb-1 uppercase tracking-wider"
+          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        >
           Category
         </label>
         <select
@@ -105,7 +108,10 @@ export default function EntryForm({
       </div>
 
       <div>
-        <label className="block text-sm mb-1" style={{ color: 'var(--color-text-muted)' }}>
+        <label
+          className="block text-sm mb-1 uppercase tracking-wider"
+          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        >
           Exercise
         </label>
         <input
@@ -117,8 +123,11 @@ export default function EntryForm({
       </div>
 
       <div>
-        <label className="block text-sm mb-1" style={{ color: 'var(--color-text-muted)' }}>
-          Quantitative Notes (sets, reps, duration, etc.)
+        <label
+          className="block text-sm mb-1 uppercase tracking-wider"
+          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        >
+          Quantitative Notes
         </label>
         <input
           type="text"
@@ -129,8 +138,11 @@ export default function EntryForm({
       </div>
 
       <div>
-        <label className="block text-sm mb-1" style={{ color: 'var(--color-text-muted)' }}>
-          Qualitative Notes (how it felt, observations)
+        <label
+          className="block text-sm mb-1 uppercase tracking-wider"
+          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        >
+          Qualitative Notes
         </label>
         <textarea
           value={notesQualitative}
@@ -141,7 +153,7 @@ export default function EntryForm({
       </div>
 
       {error && (
-        <p className="text-[var(--color-accent-red)] text-sm">{error}</p>
+        <p className="text-[var(--color-accent)] text-sm">{error}</p>
       )}
 
       <div className="flex gap-3">
@@ -150,14 +162,14 @@ export default function EntryForm({
           disabled={loading}
           className="btn btn-primary flex-1"
         >
-          {loading ? 'Saving...' : entry ? 'Update' : 'Add Entry'}
+          {loading ? 'SAVING...' : entry ? 'UPDATE' : 'ADD ENTRY'}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="btn"
         >
-          Cancel
+          CANCEL
         </button>
       </div>
     </form>

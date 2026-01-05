@@ -96,12 +96,12 @@ export default function DayModal({
       <div className="modal-backdrop" onClick={onClose} />
       <div className="modal-content panel p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl" style={{ color: 'var(--color-accent-yellow)' }}>
-            {displayDate}
+          <h2 className="text-2xl" style={{ color: 'var(--color-accent)', letterSpacing: '0.05em' }}>
+            {displayDate.toUpperCase()}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
+            className="p-2 hover:text-[var(--color-accent)] transition-colors"
           >
             <CloseIcon className="text-xl" />
           </button>
@@ -131,15 +131,19 @@ export default function DayModal({
                   <div
                     key={entry.id}
                     className="p-3 border-2"
-                    style={{ borderColor: 'var(--color-border)', background: 'var(--color-bg)' }}
+                    style={{
+                      borderColor: 'var(--color-border)',
+                      background: 'var(--color-bg)',
+                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
+                    }}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           {entry.category === 'lifting' ? (
-                            <LiftingIcon className="text-[var(--color-lifting)]" />
+                            <LiftingIcon className="text-lg text-[var(--color-lifting)]" />
                           ) : (
-                            <CardioIcon className="text-[var(--color-cardio)]" />
+                            <CardioIcon className="text-lg text-[var(--color-cardio)]" />
                           )}
                           <span
                             className={entry.category === 'lifting' ? 'badge-lifting' : 'badge-cardio'}
@@ -147,9 +151,11 @@ export default function DayModal({
                             {entry.category}
                           </span>
                         </div>
-                        <p className="font-semibold">{entry.sub_exercise}</p>
+                        <p className="font-semibold" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.03em' }}>
+                          {entry.sub_exercise.toUpperCase()}
+                        </p>
                         {entry.notes_quantitative && (
-                          <p className="text-sm" style={{ color: 'var(--color-accent-yellow)' }}>
+                          <p className="text-sm" style={{ color: 'var(--color-warning)' }}>
                             {entry.notes_quantitative}
                           </p>
                         )}
@@ -163,14 +169,14 @@ export default function DayModal({
                       <div className="flex gap-1 flex-shrink-0">
                         <button
                           onClick={() => handleEditClick(entry)}
-                          className="p-1 hover:text-[var(--color-accent-yellow)] transition-colors"
+                          className="p-1 hover:text-[var(--color-warning)] transition-colors"
                           title="Edit"
                         >
                           <EditIcon />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(entry)}
-                          className="p-1 hover:text-[var(--color-accent-red)] transition-colors"
+                          className="p-1 hover:text-[var(--color-accent)] transition-colors"
                           title="Delete"
                         >
                           <DeleteIcon />
