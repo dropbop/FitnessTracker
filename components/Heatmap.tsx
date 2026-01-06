@@ -21,7 +21,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
 // Responsive sizing constraints
-const MIN_SQUARE_SIZE = 8;
+const MIN_SQUARE_SIZE = 5;
 const MAX_SQUARE_SIZE = 14;
 const SQUARE_GAP = 2;
 const DAY_LABEL_WIDTH = 30; // Space for "Mon", "Wed", "Fri" labels
