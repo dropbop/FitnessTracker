@@ -85,6 +85,8 @@ export default function RootLayout({
         >
           <div
             style={{
+              maxWidth: '1024px',
+              margin: '0 auto',
               textAlign: 'center',
               fontFamily: 'var(--font-body)',
               fontSize: 'var(--size-xs)',
