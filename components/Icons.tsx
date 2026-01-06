@@ -13,11 +13,13 @@ export function LiftingIcon({ className = "", style }: IconProps) {
       className={className}
       style={{ width: '1em', height: '1em', ...style }}
     >
-      {/* Dumbbell icon - bold, chunky style */}
-      <rect x="1" y="9" width="4" height="6" rx="0.5" />
-      <rect x="19" y="9" width="4" height="6" rx="0.5" />
-      <rect x="3" y="7" width="3" height="10" rx="0.5" />
-      <rect x="18" y="7" width="3" height="10" rx="0.5" />
+      {/* Outer plates */}
+      <rect x="1" y="9" width="3.5" height="6" rx="0.5" />
+      <rect x="19.5" y="9" width="3.5" height="6" rx="0.5" />
+      {/* Inner plates */}
+      <rect x="3.5" y="7" width="3" height="10" rx="0.5" />
+      <rect x="17.5" y="7" width="3" height="10" rx="0.5" />
+      {/* Center bar */}
       <rect x="6" y="10.5" width="12" height="3" rx="0.5" />
     </svg>
   );
@@ -31,12 +33,12 @@ export function CardioIcon({ className = "", style }: IconProps) {
       className={className}
       style={{ width: '1em', height: '1em', ...style }}
     >
-      {/* Running figure - bold, chunky style */}
-      <circle cx="14" cy="4" r="2.5" />
-      <path
-        d="M9 8.5L12 7L15 9L18 7.5L19.5 9L17 11L14 20H11L12.5 14L9 12L6 15L4 13.5L7 10L9 8.5Z"
-        strokeWidth="0"
-      />
+      <circle cx="11.5" cy="4" r="2.5" />
+      <path d="M9.5 7H13.5L13 14H10L9.5 7Z" />
+      <path d="M10.5 13L5.5 21L8.5 22L12.5 15Z" />
+      <path d="M12.5 13L18 18L20 16L14.5 12Z" />
+      <path d="M10 8L5 12L7 14L11 10Z" />
+      <path d="M13 8L17 5L18.5 7.5L14 10Z" />
     </svg>
   );
 }
