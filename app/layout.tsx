@@ -67,6 +67,7 @@ export default function RootLayout({
             >
               <NavTab href="/" label="Calendar" />
               <NavTab href="/stats" label="Stats" />
+              <NavTab href="/exercises" label="Exercises" />
             </nav>
           </div>
         </header>

@@ -17,3 +17,17 @@ CREATE TABLE exercise_entries (
 CREATE INDEX idx_entries_date ON exercise_entries(exercise_date);
 CREATE INDEX idx_entries_category ON exercise_entries(category);
 CREATE INDEX idx_entries_date_category ON exercise_entries(exercise_date, category);
+
+-- Exercise metadata table for target associations
+CREATE TABLE exercise_metadata (
+  id SERIAL PRIMARY KEY,
+  exercise_name TEXT NOT NULL,
+  category exercise_category NOT NULL,
+  targets TEXT[] NOT NULL DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(exercise_name, category)
+);
+
+CREATE INDEX idx_metadata_exercise ON exercise_metadata(exercise_name);
+CREATE INDEX idx_metadata_category ON exercise_metadata(category);

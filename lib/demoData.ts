@@ -1,4 +1,4 @@
-import { ExerciseEntry } from './types';
+import { ExerciseEntry, ExerciseMetadata } from './types';
 
 let nextDemoId = 100;
 
@@ -279,4 +279,129 @@ export const DEMO_ENTRIES: ExerciseEntry[] = [
 export function getInitialDemoEntries(): ExerciseEntry[] {
   resetDemoId();
   return [...DEMO_ENTRIES];
+}
+
+// Demo exercise metadata with target associations
+export const DEMO_EXERCISE_METADATA: ExerciseMetadata[] = [
+  // Lifting exercises
+  {
+    id: 1,
+    exercise_name: 'Bench Press',
+    category: 'lifting',
+    targets: ['chest', 'triceps', 'shoulders'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 2,
+    exercise_name: 'Incline Dumbbell Press',
+    category: 'lifting',
+    targets: ['chest', 'shoulders'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 3,
+    exercise_name: 'Squats',
+    category: 'lifting',
+    targets: ['legs', 'glutes', 'core'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 4,
+    exercise_name: 'Romanian Deadlifts',
+    category: 'lifting',
+    targets: ['hamstrings', 'glutes', 'back'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 5,
+    exercise_name: 'Overhead Press',
+    category: 'lifting',
+    targets: ['shoulders', 'triceps'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 6,
+    exercise_name: 'Pull-ups',
+    category: 'lifting',
+    targets: ['back', 'biceps'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 7,
+    exercise_name: 'Deadlifts',
+    category: 'lifting',
+    targets: ['back', 'legs', 'glutes', 'core'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 8,
+    exercise_name: 'Barbell Rows',
+    category: 'lifting',
+    targets: ['back', 'biceps'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 9,
+    exercise_name: 'Tricep Dips',
+    category: 'lifting',
+    targets: ['triceps', 'chest', 'shoulders'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  // Cardio exercises
+  {
+    id: 10,
+    exercise_name: 'Treadmill',
+    category: 'cardio',
+    targets: ['cardio', 'legs'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 11,
+    exercise_name: 'Rowing Machine',
+    category: 'cardio',
+    targets: ['cardio', 'back', 'arms'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 12,
+    exercise_name: 'Stairmaster',
+    category: 'cardio',
+    targets: ['cardio', 'legs', 'glutes'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+  {
+    id: 13,
+    exercise_name: 'Swimming',
+    category: 'cardio',
+    targets: ['cardio', 'full body'],
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  },
+];
+
+let nextDemoMetadataId = 100;
+
+export function getNextDemoMetadataId(): number {
+  return nextDemoMetadataId++;
+}
+
+export function resetDemoMetadataId(): void {
+  nextDemoMetadataId = 100;
+}
+
+export function getInitialDemoExerciseMetadata(): ExerciseMetadata[] {
+  resetDemoMetadataId();
+  return [...DEMO_EXERCISE_METADATA];
 }

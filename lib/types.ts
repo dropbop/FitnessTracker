@@ -28,3 +28,18 @@ export interface DayEntries {
   hasCardio: boolean;
   entries: ExerciseEntry[];
 }
+
+export interface ExerciseMetadata {
+  id: number;
+  exercise_name: string;
+  category: ExerciseCategory;
+  targets: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateExerciseMetadataInput {
+  exercise_name: string;
+  category: ExerciseCategory;
+  targets: string[];
+}
