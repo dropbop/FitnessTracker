@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import {
   startOfYear,
   endOfYear,
@@ -20,8 +20,11 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 // Day labels - show only Mon, Wed, Fri to avoid crowding
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
-const SQUARE_SIZE = 10;
+// Responsive sizing constraints
+const MIN_SQUARE_SIZE = 8;
+const MAX_SQUARE_SIZE = 14;
 const SQUARE_GAP = 2;
+const DAY_LABEL_WIDTH = 30; // Space for "Mon", "Wed", "Fri" labels
 
 function getColorForCount(count: number, category: ExerciseCategory): string {
   if (count === 0) return 'var(--color-bg-deepest)';
@@ -42,6 +45,9 @@ function getColorForCount(count: number, category: ExerciseCategory): string {
 }
 
 export default function Heatmap({ entries, category, year }: HeatmapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [squareSize, setSquareSize] = useState(MIN_SQUARE_SIZE);
+
   const yearStart = startOfYear(new Date(year, 0, 1));
   const yearEnd = endOfYear(new Date(year, 0, 1));
 
@@ -67,6 +73,32 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
 
   // Calculate total weeks
   const totalWeeks = Math.ceil(allDays.length / 7);
+
+  // Calculate responsive square size based on container width
+  useEffect(() => {
+    const calculateSize = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.offsetWidth;
+      // Available width = container - day labels - padding - gaps between weeks
+      const availableWidth = containerWidth - DAY_LABEL_WIDTH - 16 - (totalWeeks - 1) * SQUARE_GAP;
+      const calculatedSize = Math.floor(availableWidth / totalWeeks);
+
+      // Clamp between min and max
+      const clampedSize = Math.max(MIN_SQUARE_SIZE, Math.min(MAX_SQUARE_SIZE, calculatedSize));
+      setSquareSize(clampedSize);
+    };
+
+    calculateSize();
+
+    // Recalculate on resize
+    const resizeObserver = new ResizeObserver(calculateSize);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [totalWeeks]);
 
   // Build the grid data: array of days in column-first order
   // CSS Grid with grid-auto-flow: column will place them correctly
@@ -147,140 +179,154 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
       </div>
 
       {/* Panel Body */}
-      <div className="panel-body" style={{ overflowX: 'auto', paddingBottom: '8px' }}>
-        {/* Main grid container */}
+      <div ref={containerRef} className="panel-body" style={{ paddingBottom: '8px' }}>
+        {/* Main grid container - centered */}
         <div
           style={{
-            display: 'inline-grid',
-            gridTemplateAreas: `"empty months" "days squares"`,
-            gridTemplateColumns: 'auto 1fr',
-            gap: '4px',
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          {/* Empty top-left cell */}
-          <div style={{ gridArea: 'empty' }} />
-
-          {/* Month labels */}
           <div
             style={{
-              gridArea: 'months',
-              display: 'grid',
-              gridTemplateColumns: `repeat(${totalWeeks}, ${SQUARE_SIZE}px)`,
-              gap: `${SQUARE_GAP}px`,
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--size-xs)',
-              color: 'var(--color-text-muted)',
+              display: 'inline-grid',
+              gridTemplateAreas: `"empty months" "days squares"`,
+              gridTemplateColumns: `${DAY_LABEL_WIDTH}px 1fr`,
+              gap: '4px',
             }}
           >
-            {monthLabels.map((label, i) => (
-              <div key={i} style={{ whiteSpace: 'nowrap', overflow: 'visible' }}>
-                {label || ''}
-              </div>
-            ))}
-          </div>
+            {/* Empty top-left cell */}
+            <div style={{ gridArea: 'empty' }} />
 
-          {/* Day labels (Sun-Sat, but only show Mon, Wed, Fri) */}
-          <div
-            style={{
-              gridArea: 'days',
-              display: 'grid',
-              gridTemplateRows: `repeat(7, ${SQUARE_SIZE}px)`,
-              gap: `${SQUARE_GAP}px`,
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--size-xs)',
-              color: 'var(--color-text-muted)',
-              paddingRight: '4px',
-            }}
-          >
-            {DAY_LABELS.map((label, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  height: `${SQUARE_SIZE}px`,
-                }}
-              >
-                {label}
-              </div>
-            ))}
-          </div>
+            {/* Month labels */}
+            <div
+              style={{
+                gridArea: 'months',
+                display: 'grid',
+                gridTemplateColumns: `repeat(${totalWeeks}, ${squareSize}px)`,
+                gap: `${SQUARE_GAP}px`,
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--size-xs)',
+                color: 'var(--color-text-muted)',
+              }}
+            >
+              {monthLabels.map((label, i) => (
+                <div key={i} style={{ whiteSpace: 'nowrap', overflow: 'visible' }}>
+                  {label || ''}
+                </div>
+              ))}
+            </div>
 
-          {/* Squares grid - THE KEY: grid-auto-flow: column */}
-          <div
-            style={{
-              gridArea: 'squares',
-              display: 'grid',
-              gridAutoFlow: 'column',
-              gridAutoColumns: `${SQUARE_SIZE}px`,
-              gridTemplateRows: `repeat(7, ${SQUARE_SIZE}px)`,
-              gap: `${SQUARE_GAP}px`,
-            }}
-          >
-            {gridDays.map((day, i) => {
-              if (!day) {
+            {/* Day labels (Sun-Sat, but only show Mon, Wed, Fri) */}
+            <div
+              style={{
+                gridArea: 'days',
+                display: 'grid',
+                gridTemplateRows: `repeat(7, ${squareSize}px)`,
+                gap: `${SQUARE_GAP}px`,
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--size-xs)',
+                color: 'var(--color-text-muted)',
+                paddingRight: '4px',
+              }}
+            >
+              {DAY_LABELS.map((label, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
+                    height: `${squareSize}px`,
+                  }}
+                >
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* Squares grid - THE KEY: grid-auto-flow: column */}
+            <div
+              style={{
+                gridArea: 'squares',
+                display: 'grid',
+                gridAutoFlow: 'column',
+                gridAutoColumns: `${squareSize}px`,
+                gridTemplateRows: `repeat(7, ${squareSize}px)`,
+                gap: `${SQUARE_GAP}px`,
+              }}
+            >
+              {gridDays.map((day, i) => {
+                if (!day) {
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        width: squareSize,
+                        height: squareSize,
+                        background: 'transparent',
+                      }}
+                    />
+                  );
+                }
+
+                const dateStr = format(day, 'yyyy-MM-dd');
+                const count = countByDate[dateStr] || 0;
+                const color = getColorForCount(count, category);
+
                 return (
                   <div
                     key={i}
                     style={{
-                      width: SQUARE_SIZE,
-                      height: SQUARE_SIZE,
-                      background: 'transparent',
+                      width: squareSize,
+                      height: squareSize,
+                      background: color,
+                      borderRadius: '2px',
+                      border: '1px solid rgba(0,0,0,0.3)',
                     }}
+                    title={`${format(day, 'MMM d, yyyy')}: ${count} ${category} ${count === 1 ? 'entry' : 'entries'}`}
                   />
                 );
-              }
-
-              const dateStr = format(day, 'yyyy-MM-dd');
-              const count = countByDate[dateStr] || 0;
-              const color = getColorForCount(count, category);
-
-              return (
-                <div
-                  key={i}
-                  style={{
-                    width: SQUARE_SIZE,
-                    height: SQUARE_SIZE,
-                    background: color,
-                    borderRadius: '1px',
-                    border: '1px solid rgba(0,0,0,0.3)',
-                  }}
-                  title={`${format(day, 'MMM d, yyyy')}: ${count} ${category} ${count === 1 ? 'entry' : 'entries'}`}
-                />
-              );
-            })}
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
+        {/* Legend - centered */}
         <div
           style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
+            justifyContent: 'center',
             marginTop: '12px',
             paddingTop: '8px',
             borderTop: '1px solid var(--color-border)',
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--size-xs)',
-            color: 'var(--color-text-muted)',
           }}
         >
-          <span>Less</span>
-          {[0, 1, 2, 3, 4].map((level) => (
-            <div
-              key={level}
-              style={{
-                width: SQUARE_SIZE,
-                height: SQUARE_SIZE,
-                background: getColorForCount(level, category),
-                borderRadius: '1px',
-                border: '1px solid rgba(0,0,0,0.3)',
-              }}
-            />
-          ))}
-          <span>More</span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-xs)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            <span>Less</span>
+            {[0, 1, 2, 3, 4].map((level) => (
+              <div
+                key={level}
+                style={{
+                  width: squareSize,
+                  height: squareSize,
+                  background: getColorForCount(level, category),
+                  borderRadius: '2px',
+                  border: '1px solid rgba(0,0,0,0.3)',
+                }}
+              />
+            ))}
+            <span>More</span>
+          </div>
         </div>
       </div>
     </div>
