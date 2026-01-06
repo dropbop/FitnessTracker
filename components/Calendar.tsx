@@ -206,12 +206,12 @@ export default function Calendar() {
           </span>
 
           {/* Activity indicators */}
-          <div style={{ position: 'absolute', bottom: '2px', left: '4px', display: 'flex', gap: '2px' }}>
+          <div style={{ position: 'absolute', bottom: '4px', left: '6px', display: 'flex', gap: '4px' }}>
             {hasLifting && (
-              <LiftingIcon style={{ fontSize: '12px', color: 'var(--color-lifting-light)' }} />
+              <LiftingIcon style={{ fontSize: '24px', color: 'var(--color-lifting-light)' }} />
             )}
             {hasCardio && (
-              <CardioIcon style={{ fontSize: '12px', color: 'var(--color-cardio-light)' }} />
+              <CardioIcon style={{ fontSize: '24px', color: 'var(--color-cardio-light)' }} />
             )}
           </div>
         </button>
