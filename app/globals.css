@@ -501,3 +501,53 @@ input[type="checkbox"] {
 .rep-square-empty {
   background: var(--color-border);
 }
+
+/* ========================================
+   RESPONSIVE SCALING - Desktop Friendly
+   Keep forum aesthetic but readable on large screens
+   ======================================== */
+
+@media (min-width: 1024px) {
+  :root {
+    --size-xs: 11px;
+    --size-sm: 12px;
+    --size-md: 13px;
+    --size-lg: 14px;
+    --size-xl: 16px;
+    --size-2xl: 20px;
+    --size-3xl: 28px;
+  }
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --size-xs: 12px;
+    --size-sm: 13px;
+    --size-md: 14px;
+    --size-lg: 15px;
+    --size-xl: 18px;
+    --size-2xl: 22px;
+    --size-3xl: 32px;
+  }
+}
+
+/* Desktop layout adjustments */
+@media (min-width: 1200px) {
+  .desktop-container {
+    max-width: 1100px;
+  }
+
+  .calendar-day {
+    min-height: 85px !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .desktop-container {
+    max-width: 1200px;
+  }
+
+  .calendar-day {
+    min-height: 100px !important;
+  }
+}

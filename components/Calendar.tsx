@@ -154,10 +154,11 @@ export default function Calendar() {
         <button
           key={day.toISOString()}
           onClick={() => setSelectedDate(currentDay)}
+          className="calendar-day"
           style={{
             position: 'relative',
-            padding: '4px',
-            minHeight: '52px',
+            padding: '6px',
+            minHeight: '72px',
             border: '1px solid var(--color-border)',
             borderRadius: '2px',
             cursor: 'pointer',

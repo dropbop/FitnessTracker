@@ -22,7 +22,7 @@ export default function RootLayout({
             borderBottom: '2px solid var(--color-vb-blue)',
           }}
         >
-          <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px 16px' }}>
+          <div className="desktop-container" style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px 16px' }}>
             {/* Logo and user area */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <Link href="/" style={{ textDecoration: 'none' }}>
@@ -70,7 +70,7 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main style={{ maxWidth: '1024px', margin: '0 auto', padding: '16px' }}>
+        <main className="desktop-container" style={{ maxWidth: '1024px', margin: '0 auto', padding: '16px' }}>
           {children}
         </main>
 
@@ -79,27 +79,21 @@ export default function RootLayout({
           style={{
             backgroundColor: 'var(--color-bg-deepest)',
             borderTop: '1px solid var(--color-border)',
-            padding: '16px',
+            padding: '12px',
             marginTop: '32px',
           }}
         >
           <div
             style={{
-              maxWidth: '1024px',
-              margin: '0 auto',
               textAlign: 'center',
               fontFamily: 'var(--font-body)',
               fontSize: 'var(--size-xs)',
               color: 'var(--color-text-darkest)',
             }}
+            className="desktop-container"
           >
-            <div style={{ marginBottom: '4px', color: 'var(--color-text-dark)' }}>
-              Powered by Next.js | Mid-2000s Bodybuilding Forum Aesthetic
-            </div>
-            <div>
-              All times are GMT. The time now is{' '}
-              <TimeDisplay />
-            </div>
+            All times are CST. The time now is{' '}
+            <TimeDisplay />
           </div>
         </footer>
       </body>
@@ -131,7 +125,11 @@ function NavTab({ href, label }: { href: string; label: string }) {
 function TimeDisplay() {
   return (
     <span suppressHydrationWarning>
-      {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+      {new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Chicago'
+      })}
     </span>
   );
 }
