@@ -45,8 +45,8 @@ export default function StatsPage() {
     }
   };
 
-  const liftingCount = entries.filter((e) => e.category === 'lifting').length;
-  const cardioCount = entries.filter((e) => e.category === 'cardio').length;
+  const liftingDays = new Set(entries.filter((e) => e.category === 'lifting').map((e) => e.exercise_date)).size;
+  const cardioDays = new Set(entries.filter((e) => e.category === 'cardio').map((e) => e.exercise_date)).size;
 
   return (
     <div>
@@ -119,7 +119,7 @@ export default function StatsPage() {
                     letterSpacing: '2px',
                   }}
                 >
-                  {liftingCount}
+                  {liftingDays}
                 </div>
                 <div
                   style={{
@@ -130,7 +130,7 @@ export default function StatsPage() {
                     marginTop: '4px',
                   }}
                 >
-                  Lifting Entries
+                  Lifting Days
                 </div>
               </div>
 
@@ -153,7 +153,7 @@ export default function StatsPage() {
                     letterSpacing: '2px',
                   }}
                 >
-                  {cardioCount}
+                  {cardioDays}
                 </div>
                 <div
                   style={{
@@ -164,7 +164,7 @@ export default function StatsPage() {
                     marginTop: '4px',
                   }}
                 >
-                  Cardio Entries
+                  Cardio Days
                 </div>
               </div>
             </div>

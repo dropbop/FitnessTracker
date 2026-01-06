@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Link from "next/link";
+import TimeDisplay from "@/components/TimeDisplay";
 
 export const metadata: Metadata = {
   title: "IRONTRACK",
@@ -123,15 +124,3 @@ function NavTab({ href, label }: { href: string; label: string }) {
   );
 }
 
-// Client component for time display (to avoid hydration issues)
-function TimeDisplay() {
-  return (
-    <span suppressHydrationWarning>
-      {new Date().toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'America/Chicago'
-      })}
-    </span>
-  );
-}

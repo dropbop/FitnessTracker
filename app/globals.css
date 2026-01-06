@@ -503,6 +503,23 @@ input[type="checkbox"] {
 }
 
 /* ========================================
+   RESPONSIVE ICON SIZING
+   Slightly smaller on mobile for better fit
+   ======================================== */
+
+.icon-responsive {
+  width: 1em;
+  height: 1em;
+}
+
+@media (max-width: 768px) {
+  .icon-responsive {
+    width: 0.9em;
+    height: 0.9em;
+  }
+}
+
+/* ========================================
    RESPONSIVE SCALING - Desktop Friendly
    Keep forum aesthetic but readable on large screens
    ======================================== */

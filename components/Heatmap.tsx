@@ -9,6 +9,7 @@ import {
   startOfWeek,
 } from 'date-fns';
 import { ExerciseEntry, ExerciseCategory } from '@/lib/types';
+import { LiftingIcon, CardioIcon } from './Icons';
 
 interface HeatmapProps {
   entries: ExerciseEntry[];
@@ -165,7 +166,10 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
           gap: '8px',
         }}
       >
-        <span style={{ fontSize: '14px' }}>{category === 'lifting' ? '🏋️' : '🏃'}</span>
+        {category === 'lifting'
+          ? <LiftingIcon style={{ fontSize: '14px', color: categoryColor }} />
+          : <CardioIcon style={{ fontSize: '14px', color: categoryColor }} />
+        }
         <span
           style={{
             fontFamily: 'var(--font-display)',
