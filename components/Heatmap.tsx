@@ -6,9 +6,7 @@ import {
   endOfYear,
   eachDayOfInterval,
   format,
-  getDay,
   startOfWeek,
-  addDays,
 } from 'date-fns';
 import { ExerciseEntry, ExerciseCategory } from '@/lib/types';
 
@@ -22,24 +20,24 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 // Day labels - show only Mon, Wed, Fri to avoid crowding
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
-const SQUARE_SIZE = 11;
-const SQUARE_GAP = 3;
+const SQUARE_SIZE = 10;
+const SQUARE_GAP = 2;
 
 function getColorForCount(count: number, category: ExerciseCategory): string {
-  if (count === 0) return '#1a1a1a';
+  if (count === 0) return 'var(--color-bg-deepest)';
 
   if (category === 'lifting') {
     // Red shades for lifting
-    if (count === 1) return '#4a0000';
-    if (count === 2) return '#7a0000';
-    if (count === 3) return '#aa0000';
-    return '#cc0000';
+    if (count === 1) return '#4a1515';
+    if (count === 2) return '#7a2020';
+    if (count === 3) return '#aa2b2b';
+    return '#cc3333';
   } else {
     // Yellow/gold shades for cardio
-    if (count === 1) return '#4a3d00';
-    if (count === 2) return '#7a6600';
-    if (count === 3) return '#b38f00';
-    return '#ffcc00';
+    if (count === 1) return '#4a3d15';
+    if (count === 2) return '#7a6620';
+    if (count === 3) return '#aa8f2b';
+    return '#cc9900';
   }
 }
 
@@ -121,21 +119,35 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
   }, [allDays, totalWeeks, year]);
 
   const categoryLabel = category === 'lifting' ? 'LIFTING' : 'CARDIO';
-  const categoryColor = category === 'lifting' ? '#cc0000' : '#ffcc00';
-
-  // Calculate grid dimensions for inline styles
-  const gridWidth = totalWeeks * SQUARE_SIZE + (totalWeeks - 1) * SQUARE_GAP;
+  const categoryColor = category === 'lifting' ? 'var(--color-lifting)' : 'var(--color-cardio)';
 
   return (
-    <div className="panel p-4" style={{ borderTop: `3px solid ${categoryColor}` }}>
-      <h3
-        className="text-xl mb-4"
-        style={{ fontFamily: 'var(--font-heading)', color: categoryColor, letterSpacing: '0.1em' }}
+    <div className="panel">
+      {/* Panel Header - Forum style with category accent */}
+      <div
+        className="panel-header"
+        style={{
+          borderTop: `3px solid ${categoryColor}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+        }}
       >
-        {categoryLabel} — {year}
-      </h3>
+        <span style={{ fontSize: '14px' }}>{category === 'lifting' ? '🏋️' : '🏃'}</span>
+        <span
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--size-xl)',
+            color: categoryColor,
+            letterSpacing: '2px',
+          }}
+        >
+          {categoryLabel} — {year}
+        </span>
+      </div>
 
-      <div className="overflow-x-auto pb-2">
+      {/* Panel Body */}
+      <div className="panel-body" style={{ overflowX: 'auto', paddingBottom: '8px' }}>
         {/* Main grid container */}
         <div
           style={{
@@ -155,7 +167,8 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
               display: 'grid',
               gridTemplateColumns: `repeat(${totalWeeks}, ${SQUARE_SIZE}px)`,
               gap: `${SQUARE_GAP}px`,
-              fontSize: '10px',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-xs)',
               color: 'var(--color-text-muted)',
             }}
           >
@@ -173,7 +186,8 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
               display: 'grid',
               gridTemplateRows: `repeat(7, ${SQUARE_SIZE}px)`,
               gap: `${SQUARE_GAP}px`,
-              fontSize: '10px',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-xs)',
               color: 'var(--color-text-muted)',
               paddingRight: '4px',
             }}
@@ -229,7 +243,8 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
                     width: SQUARE_SIZE,
                     height: SQUARE_SIZE,
                     background: color,
-                    borderRadius: '2px',
+                    borderRadius: '1px',
+                    border: '1px solid rgba(0,0,0,0.3)',
                   }}
                   title={`${format(day, 'MMM d, yyyy')}: ${count} ${category} ${count === 1 ? 'entry' : 'entries'}`}
                 />
@@ -245,7 +260,10 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
             alignItems: 'center',
             gap: '4px',
             marginTop: '12px',
-            fontSize: '11px',
+            paddingTop: '8px',
+            borderTop: '1px solid var(--color-border)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-xs)',
             color: 'var(--color-text-muted)',
           }}
         >
@@ -257,7 +275,8 @@ export default function Heatmap({ entries, category, year }: HeatmapProps) {
                 width: SQUARE_SIZE,
                 height: SQUARE_SIZE,
                 background: getColorForCount(level, category),
-                borderRadius: '2px',
+                borderRadius: '1px',
+                border: '1px solid rgba(0,0,0,0.3)',
               }}
             />
           ))}

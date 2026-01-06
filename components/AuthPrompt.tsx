@@ -41,63 +41,112 @@ export default function AuthPrompt({ onSuccess, onClose }: AuthPromptProps) {
   return (
     <>
       <div className="modal-backdrop" onClick={onClose} />
-      <div className="modal-content panel p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl" style={{ color: 'var(--color-accent)', letterSpacing: '0.1em' }}>
-            LOGIN
+      <div className="modal-content">
+        {/* Modal Header - Forum login style */}
+        <div className="modal-header">
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>🔐</span>
+            Member Login
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:text-[var(--color-accent)] transition-colors"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-muted)',
+              cursor: 'pointer',
+              padding: '2px 6px',
+              fontSize: 'var(--size-lg)',
+            }}
           >
-            <CloseIcon className="text-xl" />
+            <CloseIcon />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              className="block text-sm mb-1 uppercase tracking-wider"
-              style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+        {/* Modal Body */}
+        <div className="modal-body">
+          <form onSubmit={handleSubmit}>
+            {/* Username */}
+            <div style={{ marginBottom: '10px' }}>
+              <label
+                className="form-label"
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
+              >
+                Username:
+              </label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoFocus
+                autoComplete="username"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-md)',
+                }}
+              />
+            </div>
+
+            {/* Password */}
+            <div style={{ marginBottom: '10px' }}>
+              <label
+                className="form-label"
+                style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
+              >
+                Password:
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-md)',
+                }}
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <p
+                style={{
+                  color: 'var(--color-accent-red)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-sm)',
+                  marginBottom: '10px',
+                }}
+              >
+                {error}
+              </p>
+            )}
+
+            {/* Login Button - Glossy primary style */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary"
+              style={{ width: '100%' }}
             >
-              Username
-            </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              autoFocus
-              autoComplete="username"
-            />
-          </div>
+              {loading ? 'Checking...' : 'Log In'}
+            </button>
+          </form>
 
-          <div>
-            <label
-              className="block text-sm mb-1 uppercase tracking-wider"
-              style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
-            >
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-            />
-          </div>
-
-          {error && (
-            <p className="text-[var(--color-accent)] text-sm">{error}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary w-full"
+          {/* Footer links - Forum style */}
+          <div
+            style={{
+              marginTop: '12px',
+              paddingTop: '10px',
+              borderTop: '1px solid var(--color-border)',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-xs)',
+            }}
           >
-            {loading ? 'CHECKING...' : 'LOGIN'}
-          </button>
-        </form>
+            <span style={{ color: 'var(--color-text-dark)' }}>
+              No account? This is a personal tracker - credentials are set via environment variables.
+            </span>
+          </div>
+        </div>
       </div>
     </>
   );

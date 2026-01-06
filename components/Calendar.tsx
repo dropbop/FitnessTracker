@@ -139,6 +139,7 @@ export default function Calendar() {
 
     const days: React.ReactNode[] = [];
     let day = startDate;
+    let dayIndex = 0;
 
     while (day <= endDate) {
       const currentDay = day;
@@ -147,45 +148,76 @@ export default function Calendar() {
       const dayEntries = getEntriesForDate(day);
       const hasLifting = dayEntries.some((e) => e.category === 'lifting');
       const hasCardio = dayEntries.some((e) => e.category === 'cardio');
+      const isWeekend = day.getDay() === 0 || day.getDay() === 6;
 
       days.push(
         <button
           key={day.toISOString()}
           onClick={() => setSelectedDate(currentDay)}
-          className={`
-            relative p-2 min-h-[60px] md:min-h-[80px] border-2 transition-colors
-            ${isCurrentMonth ? '' : 'opacity-30'}
-            ${isToday ? 'border-[var(--color-accent)]' : 'border-[var(--color-border)]'}
-            hover:border-[var(--color-border-light)] hover:bg-[var(--color-surface-hover)]
-          `}
           style={{
-            background: isToday ? 'rgba(204, 0, 0, 0.1)' : '#111111',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(255,255,255,0.03)',
-            borderTopColor: isToday ? undefined : '#0a0a0a',
-            borderBottomColor: isToday ? undefined : '#2a2a2a',
+            position: 'relative',
+            padding: '4px',
+            minHeight: '52px',
+            border: '1px solid var(--color-border)',
+            borderRadius: '2px',
+            cursor: 'pointer',
+            textAlign: 'left',
+            verticalAlign: 'top',
+            // Zebra striping based on row
+            backgroundColor: isToday
+              ? 'var(--color-vb-blue)'
+              : dayIndex % 2 === 0
+                ? 'var(--color-bg-lighter)'
+                : 'var(--color-bg-light)',
+            opacity: isCurrentMonth ? 1 : 0.3,
+            transition: 'background 0.1s',
+          }}
+          onMouseEnter={(e) => {
+            if (!isToday) {
+              e.currentTarget.style.backgroundColor = 'var(--color-bg-lightest)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isToday) {
+              e.currentTarget.style.backgroundColor = dayIndex % 2 === 0
+                ? 'var(--color-bg-lighter)'
+                : 'var(--color-bg-light)';
+            }
           }}
         >
+          {/* Day number */}
           <span
-            className={`
-              absolute top-1 left-2 text-sm
-              ${isToday ? 'text-[var(--color-accent)]' : ''}
-            `}
-            style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
+            style={{
+              position: 'absolute',
+              top: '2px',
+              left: '4px',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-sm)',
+              fontWeight: isToday ? 'bold' : 'normal',
+              color: isToday
+                ? 'var(--color-text-primary)'
+                : isWeekend
+                  ? 'var(--color-accent-red)'
+                  : 'var(--color-text-secondary)',
+            }}
           >
             {format(day, 'd')}
           </span>
-          <div className="absolute bottom-1 left-1 flex gap-1">
+
+          {/* Activity indicators */}
+          <div style={{ position: 'absolute', bottom: '2px', left: '4px', display: 'flex', gap: '2px' }}>
             {hasLifting && (
-              <LiftingIcon className="text-lg text-[var(--color-lifting)]" />
+              <LiftingIcon style={{ fontSize: '12px', color: 'var(--color-lifting-light)' }} />
             )}
             {hasCardio && (
-              <CardioIcon className="text-lg text-[var(--color-cardio)]" />
+              <CardioIcon style={{ fontSize: '12px', color: 'var(--color-cardio-light)' }} />
             )}
           </div>
         </button>
       );
 
       day = addDays(day, 1);
+      dayIndex++;
     }
 
     return days;
@@ -193,90 +225,157 @@ export default function Calendar() {
 
   return (
     <div {...swipeHandlers}>
-      {/* Demo Mode Banner */}
+      {/* Demo Mode Banner - Forum warning style */}
       {mode === 'demo' && (
-        <div
-          className="demo-banner mb-4 p-3 text-center"
-        >
+        <div className="demo-banner mb-3 p-2 text-center">
+          <span style={{ marginRight: '8px' }}>⚠️</span>
           DEMO MODE — CHANGES NOT SAVED
         </div>
       )}
 
-      {/* Month Navigation */}
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={goToPreviousMonth}
-          className="btn p-3"
-          aria-label="Previous month"
+      {/* Month Navigation - Forum panel style */}
+      <div
+        className="panel"
+        style={{ marginBottom: '12px' }}
+      >
+        <div
+          className="panel-header"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
         >
-          <ChevronLeftIcon className="text-xl" />
-        </button>
-        <h1
-          className="text-3xl md:text-4xl"
-          style={{ color: 'var(--color-accent)', letterSpacing: '0.08em' }}
-        >
-          {format(currentMonth, 'MMMM yyyy').toUpperCase()}
-        </h1>
-        <button
-          onClick={goToNextMonth}
-          className="btn p-3"
-          aria-label="Next month"
-        >
-          <ChevronRightIcon className="text-xl" />
-        </button>
-      </div>
-
-      {/* Auth Status */}
-      <div className="flex justify-end mb-4">
-        {mode === 'real' ? (
+          {/* Previous month button */}
           <button
-            onClick={handleLogout}
-            className="text-sm hover:text-[var(--color-accent)] transition-colors uppercase tracking-wider"
-            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+            onClick={goToPreviousMonth}
+            className="btn"
+            style={{ padding: '4px 10px' }}
+            aria-label="Previous month"
           >
-            Logout
+            <ChevronLeftIcon style={{ fontSize: '14px' }} />
           </button>
-        ) : (
-          <button
-            onClick={() => setShowAuthPrompt(true)}
-            className="text-sm hover:text-[var(--color-accent)] transition-colors uppercase tracking-wider"
-            style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
-          >
-            Login
-          </button>
-        )}
-      </div>
 
-      {/* Weekday Headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
-        {WEEKDAYS.map((day) => (
-          <div
-            key={day}
-            className="text-center py-2"
+          {/* Month/Year title */}
+          <span
             style={{
-              fontFamily: 'var(--font-heading)',
-              color: 'var(--color-text-muted)',
-              letterSpacing: '0.1em',
-              fontSize: '0.9rem',
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--size-2xl)',
+              color: 'var(--color-accent-orange)',
+              letterSpacing: '2px',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(255,102,0,0.3)',
             }}
           >
-            {day.toUpperCase()}
-          </div>
-        ))}
-      </div>
+            {format(currentMonth, 'MMMM yyyy').toUpperCase()}
+          </span>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1">{renderCalendarDays()}</div>
-
-      {/* Legend */}
-      <div className="flex gap-8 mt-6 justify-center">
-        <div className="flex items-center gap-2">
-          <LiftingIcon className="text-xl text-[var(--color-lifting)]" />
-          <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>LIFTING</span>
+          {/* Next month button */}
+          <button
+            onClick={goToNextMonth}
+            className="btn"
+            style={{ padding: '4px 10px' }}
+            aria-label="Next month"
+          >
+            <ChevronRightIcon style={{ fontSize: '14px' }} />
+          </button>
         </div>
-        <div className="flex items-center gap-2">
-          <CardioIcon className="text-xl text-[var(--color-cardio)]" />
-          <span style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.08em' }}>CARDIO</span>
+
+        <div className="panel-body" style={{ padding: '8px' }}>
+          {/* Auth Status */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '8px' }}>
+            {mode === 'real' ? (
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-vb-blue-light)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-sm)',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowAuthPrompt(true)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--color-vb-blue-light)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-sm)',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              >
+                Login
+              </button>
+            )}
+          </div>
+
+          {/* Weekday Headers */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '2px' }}>
+            {WEEKDAYS.map((day, i) => (
+              <div
+                key={day}
+                style={{
+                  textAlign: 'center',
+                  padding: '4px',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-xs)',
+                  fontWeight: 'bold',
+                  color: i === 0 || i === 6 ? 'var(--color-accent-red)' : 'var(--color-text-muted)',
+                  backgroundColor: 'var(--color-bg-deepest)',
+                  borderRadius: '2px',
+                }}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
+
+          {/* Calendar Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+            {renderCalendarDays()}
+          </div>
+
+          {/* Legend */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '16px',
+              justifyContent: 'center',
+              marginTop: '12px',
+              paddingTop: '8px',
+              borderTop: '1px solid var(--color-border)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '8px',
+                  backgroundColor: 'var(--color-vb-blue)',
+                  marginRight: '4px',
+                }}
+              />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-xs)', color: 'var(--color-text-dark)' }}>
+                Today
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <LiftingIcon style={{ fontSize: '12px', color: 'var(--color-lifting-light)' }} />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-xs)', color: 'var(--color-text-dark)' }}>
+                Lifting
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <CardioIcon style={{ fontSize: '12px', color: 'var(--color-cardio-light)' }} />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-xs)', color: 'var(--color-text-dark)' }}>
+                Cardio
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 

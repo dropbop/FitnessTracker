@@ -1,22 +1,9 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  weight: ["400"],
-});
-
-const robotoCondensed = Roboto_Condensed({
-  variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
-
 export const metadata: Metadata = {
-  title: "FITNESSTRACKER",
+  title: "IRONTRACK",
   description: "Track your lifting and cardio workouts",
 };
 
@@ -27,64 +14,124 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${bebasNeue.variable} ${robotoCondensed.variable}`}>
+      <body>
+        {/* Forum-style header with gradient and blue accent */}
         <header
-          className="border-b-[6px] relative"
           style={{
-            background: 'linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%)',
-            borderColor: 'var(--color-accent)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.5)',
+            background: 'linear-gradient(180deg, #2a3a5a 0%, #1a2540 50%, #0f1525 100%)',
+            borderBottom: '2px solid var(--color-vb-blue)',
           }}
         >
-          {/* Hazard stripe overlay */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,204,0,0.02) 10px, rgba(255,204,0,0.02) 20px)',
-            }}
-          />
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between relative">
-            <Link href="/" className="flex items-center gap-3">
-              <span
-                className="text-3xl tracking-wider"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  color: 'var(--color-accent)',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(204,0,0,0.3)',
-                }}
-              >
-                FITNESSTRACKER
-              </span>
-            </Link>
-            <nav className="flex items-center gap-6">
-              <Link
-                href="/"
-                className="text-lg tracking-wider transition-colors hover:text-[var(--color-accent)]"
-                style={{
-                  fontFamily: 'var(--font-heading)',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                CALENDAR
+          <div style={{ maxWidth: '1024px', margin: '0 auto', padding: '12px 16px' }}>
+            {/* Logo and user area */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <Link href="/" style={{ textDecoration: 'none' }}>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--size-3xl)',
+                    fontWeight: 'bold',
+                    letterSpacing: '2px',
+                    textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(255,102,0,0.3)',
+                  }}
+                >
+                  <span style={{ color: 'var(--color-accent-orange)' }}>IRON</span>
+                  <span style={{ color: 'var(--color-text-primary)' }}>TRACK</span>
+                </div>
               </Link>
-              <Link
-                href="/stats"
-                className="text-lg tracking-wider transition-colors hover:text-[var(--color-accent)]"
+
+              {/* User status placeholder */}
+              <div
                 style={{
-                  fontFamily: 'var(--font-heading)',
-                  letterSpacing: '0.08em',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-sm)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
                 }}
               >
-                STATS
-              </Link>
+                <span style={{ color: 'var(--color-text-muted)' }}>Fitness Tracker v1.0</span>
+              </div>
+            </div>
+
+            {/* Navigation bar - forum style tabs */}
+            <nav
+              style={{
+                display: 'flex',
+                gap: '2px',
+                backgroundColor: 'rgba(0,0,0,0.3)',
+                padding: '0 8px',
+                borderRadius: '3px',
+              }}
+            >
+              <NavTab href="/" label="Calendar" />
+              <NavTab href="/stats" label="Stats" />
             </nav>
           </div>
         </header>
-        <main className="max-w-6xl mx-auto px-4 py-6">
+
+        <main style={{ maxWidth: '1024px', margin: '0 auto', padding: '16px' }}>
           {children}
         </main>
+
+        {/* Forum-style footer */}
+        <footer
+          style={{
+            backgroundColor: 'var(--color-bg-deepest)',
+            borderTop: '1px solid var(--color-border)',
+            padding: '16px',
+            marginTop: '32px',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1024px',
+              margin: '0 auto',
+              textAlign: 'center',
+              fontFamily: 'var(--font-body)',
+              fontSize: 'var(--size-xs)',
+              color: 'var(--color-text-darkest)',
+            }}
+          >
+            <div style={{ marginBottom: '4px', color: 'var(--color-text-dark)' }}>
+              Powered by Next.js | Mid-2000s Bodybuilding Forum Aesthetic
+            </div>
+            <div>
+              All times are GMT. The time now is{' '}
+              <TimeDisplay />
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
+  );
+}
+
+// Navigation tab component with forum styling
+function NavTab({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      style={{
+        padding: '8px 16px',
+        color: 'var(--color-vb-blue-light)',
+        fontFamily: 'var(--font-body)',
+        fontSize: 'var(--size-md)',
+        textDecoration: 'none',
+        transition: 'background 0.1s, color 0.1s',
+      }}
+      className="nav-tab"
+    >
+      {label}
+    </Link>
+  );
+}
+
+// Client component for time display (to avoid hydration issues)
+function TimeDisplay() {
+  return (
+    <span suppressHydrationWarning>
+      {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+    </span>
   );
 }

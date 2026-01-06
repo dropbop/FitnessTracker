@@ -90,86 +90,119 @@ export default function EntryForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
+    <form onSubmit={handleSubmit}>
+      {/* Category Select */}
+      <div style={{ marginBottom: '10px' }}>
         <label
-          className="block text-sm mb-1 uppercase tracking-wider"
-          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+          className="form-label"
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
         >
-          Category
+          Category:
         </label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value as ExerciseCategory)}
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-md)',
+          }}
         >
           <option value="lifting">Lifting</option>
           <option value="cardio">Cardio</option>
         </select>
       </div>
 
-      <div>
+      {/* Exercise Name */}
+      <div style={{ marginBottom: '10px' }}>
         <label
-          className="block text-sm mb-1 uppercase tracking-wider"
-          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+          className="form-label"
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
         >
-          Exercise
+          Exercise:
         </label>
         <input
           type="text"
           value={subExercise}
           onChange={(e) => setSubExercise(e.target.value)}
           placeholder="e.g., Bench Press, Treadmill, Push Ups"
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-md)',
+          }}
         />
       </div>
 
-      <div>
+      {/* Quantitative Notes */}
+      <div style={{ marginBottom: '10px' }}>
         <label
-          className="block text-sm mb-1 uppercase tracking-wider"
-          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+          className="form-label"
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
         >
-          Quantitative Notes
+          Quantitative Notes:
         </label>
         <input
           type="text"
           value={notesQuantitative}
           onChange={(e) => setNotesQuantitative(e.target.value)}
           placeholder="e.g., 3x10 @ 135lbs, 30 min, 50 reps"
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-md)',
+          }}
         />
       </div>
 
-      <div>
+      {/* Qualitative Notes */}
+      <div style={{ marginBottom: '10px' }}>
         <label
-          className="block text-sm mb-1 uppercase tracking-wider"
-          style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+          className="form-label"
+          style={{ fontFamily: 'var(--font-body)', fontSize: 'var(--size-sm)' }}
         >
-          Qualitative Notes
+          Qualitative Notes:
         </label>
         <textarea
           value={notesQualitative}
           onChange={(e) => setNotesQualitative(e.target.value)}
           placeholder="e.g., Felt strong today, need to work on form"
           rows={2}
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-md)',
+            resize: 'vertical',
+          }}
         />
       </div>
 
+      {/* Error Message */}
       {error && (
-        <p className="text-[var(--color-accent)] text-sm">{error}</p>
+        <p
+          style={{
+            color: 'var(--color-accent-red)',
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--size-sm)',
+            marginBottom: '10px',
+          }}
+        >
+          {error}
+        </p>
       )}
 
-      <div className="flex gap-3">
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: '8px' }}>
         <button
           type="submit"
           disabled={loading}
-          className="btn btn-primary flex-1"
+          className="btn btn-primary"
+          style={{ flex: 1 }}
         >
-          {loading ? 'SAVING...' : entry ? 'UPDATE' : 'ADD ENTRY'}
+          {loading ? 'Saving...' : entry ? 'Update' : 'Add Entry'}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="btn"
         >
-          CANCEL
+          Cancel
         </button>
       </div>
     </form>

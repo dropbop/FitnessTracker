@@ -94,106 +94,181 @@ export default function DayModal({
   return (
     <>
       <div className="modal-backdrop" onClick={onClose} />
-      <div className="modal-content panel p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl" style={{ color: 'var(--color-accent)', letterSpacing: '0.05em' }}>
-            {displayDate.toUpperCase()}
+      <div className="modal-content">
+        {/* Modal Header - Forum style with gradient */}
+        <div className="modal-header">
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>📅</span>
+            {displayDate}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:text-[var(--color-accent)] transition-colors"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--color-text-muted)',
+              cursor: 'pointer',
+              padding: '2px 6px',
+              fontSize: 'var(--size-lg)',
+            }}
           >
-            <CloseIcon className="text-xl" />
+            <CloseIcon />
           </button>
         </div>
 
-        {showForm ? (
-          <EntryForm
-            date={dateStr}
-            entry={editingEntry || undefined}
-            mode={mode}
-            onSave={handleSave}
-            onDemoSave={handleDemoSave}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingEntry(null);
-            }}
-          />
-        ) : (
-          <>
-            {entries.length === 0 ? (
-              <p style={{ color: 'var(--color-text-muted)' }} className="mb-4">
-                No entries for this day.
-              </p>
-            ) : (
-              <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-                {entries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="p-3 border-2"
-                    style={{
-                      borderColor: 'var(--color-border)',
-                      background: 'var(--color-bg)',
-                      boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.3)',
-                    }}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {entry.category === 'lifting' ? (
-                            <LiftingIcon className="text-lg text-[var(--color-lifting)]" />
-                          ) : (
-                            <CardioIcon className="text-lg text-[var(--color-cardio)]" />
-                          )}
-                          <span
-                            className={entry.category === 'lifting' ? 'badge-lifting' : 'badge-cardio'}
+        {/* Modal Body */}
+        <div className="modal-body">
+          {showForm ? (
+            <EntryForm
+              date={dateStr}
+              entry={editingEntry || undefined}
+              mode={mode}
+              onSave={handleSave}
+              onDemoSave={handleDemoSave}
+              onCancel={() => {
+                setShowForm(false);
+                setEditingEntry(null);
+              }}
+            />
+          ) : (
+            <>
+              {entries.length === 0 ? (
+                <p
+                  style={{
+                    color: 'var(--color-text-muted)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--size-md)',
+                    marginBottom: '12px',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  No entries for this day.
+                </p>
+              ) : (
+                <div style={{ marginBottom: '12px', maxHeight: '240px', overflowY: 'auto' }}>
+                  {entries.map((entry, index) => (
+                    <div
+                      key={entry.id}
+                      style={{
+                        padding: '8px 10px',
+                        // Zebra striping
+                        backgroundColor: index % 2 === 0 ? 'var(--color-bg-lighter)' : 'var(--color-bg-light)',
+                        borderBottom: index < entries.length - 1 ? '1px solid var(--color-border)' : 'none',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {/* Category badge and icon */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                            {entry.category === 'lifting' ? (
+                              <LiftingIcon style={{ fontSize: '14px', color: 'var(--color-lifting-light)' }} />
+                            ) : (
+                              <CardioIcon style={{ fontSize: '14px', color: 'var(--color-cardio-light)' }} />
+                            )}
+                            <span className={entry.category === 'lifting' ? 'badge-lifting' : 'badge-cardio'}>
+                              {entry.category}
+                            </span>
+                          </div>
+
+                          {/* Exercise name */}
+                          <p
+                            style={{
+                              fontFamily: 'var(--font-body)',
+                              fontSize: 'var(--size-md)',
+                              fontWeight: 'bold',
+                              color: 'var(--color-text-primary)',
+                              marginBottom: '2px',
+                            }}
                           >
-                            {entry.category}
-                          </span>
+                            {entry.sub_exercise}
+                          </p>
+
+                          {/* Quantitative notes */}
+                          {entry.notes_quantitative && (
+                            <p
+                              style={{
+                                fontFamily: 'var(--font-body)',
+                                fontSize: 'var(--size-sm)',
+                                color: 'var(--color-accent-orange)',
+                              }}
+                            >
+                              {entry.notes_quantitative}
+                            </p>
+                          )}
+
+                          {/* Qualitative notes - quote box style */}
+                          {entry.notes_qualitative && (
+                            <div
+                              style={{
+                                marginTop: '4px',
+                                paddingLeft: '8px',
+                                borderLeft: '2px solid var(--color-vb-blue)',
+                                fontFamily: 'var(--font-body)',
+                                fontSize: 'var(--size-sm)',
+                                color: 'var(--color-text-muted)',
+                                fontStyle: 'italic',
+                              }}
+                            >
+                              {entry.notes_qualitative}
+                            </div>
+                          )}
                         </div>
-                        <p className="font-semibold" style={{ fontFamily: 'var(--font-heading)', letterSpacing: '0.03em' }}>
-                          {entry.sub_exercise.toUpperCase()}
-                        </p>
-                        {entry.notes_quantitative && (
-                          <p className="text-sm" style={{ color: 'var(--color-warning)' }}>
-                            {entry.notes_quantitative}
-                          </p>
-                        )}
-                        {entry.notes_qualitative && (
-                          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                            {entry.notes_qualitative}
-                          </p>
-                        )}
-                      </div>
-                      {/* Edit/delete buttons - same for both modes */}
-                      <div className="flex gap-1 flex-shrink-0">
-                        <button
-                          onClick={() => handleEditClick(entry)}
-                          className="p-1 hover:text-[var(--color-warning)] transition-colors"
-                          title="Edit"
-                        >
-                          <EditIcon />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteClick(entry)}
-                          className="p-1 hover:text-[var(--color-accent)] transition-colors"
-                          title="Delete"
-                        >
-                          <DeleteIcon />
-                        </button>
+
+                        {/* Action buttons */}
+                        <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+                          <button
+                            onClick={() => handleEditClick(entry)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-vb-blue-light)',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              fontSize: 'var(--size-lg)',
+                            }}
+                            title="Edit"
+                          >
+                            <EditIcon />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(entry)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--color-accent-red)',
+                              cursor: 'pointer',
+                              padding: '2px',
+                              fontSize: 'var(--size-lg)',
+                            }}
+                            title="Delete"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
 
-            <button onClick={handleAddClick} className="btn btn-secondary w-full flex items-center justify-center gap-2">
-              <PlusIcon />
-              Add Entry
-            </button>
-          </>
-        )}
+              {/* Add Entry Button - Glossy secondary style */}
+              <button
+                onClick={handleAddClick}
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <PlusIcon style={{ fontSize: '14px' }} />
+                Add Entry
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </>
   );

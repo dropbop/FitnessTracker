@@ -1,10 +1,17 @@
-export function LiftingIcon({ className = "" }: { className?: string }) {
+import { CSSProperties } from 'react';
+
+interface IconProps {
+  className?: string;
+  style?: CSSProperties;
+}
+
+export function LiftingIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       {/* Dumbbell icon - bold, chunky style */}
       <rect x="1" y="9" width="4" height="6" rx="0.5" />
@@ -16,13 +23,13 @@ export function LiftingIcon({ className = "" }: { className?: string }) {
   );
 }
 
-export function CardioIcon({ className = "" }: { className?: string }) {
+export function CardioIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       {/* Running figure - bold, chunky style */}
       <circle cx="14" cy="4" r="2.5" />
@@ -34,7 +41,7 @@ export function CardioIcon({ className = "" }: { className?: string }) {
   );
 }
 
-export function ChevronLeftIcon({ className = "" }: { className?: string }) {
+export function ChevronLeftIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -43,14 +50,14 @@ export function ChevronLeftIcon({ className = "" }: { className?: string }) {
       strokeWidth="3"
       strokeLinecap="square"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M15 6L9 12L15 18" />
     </svg>
   );
 }
 
-export function ChevronRightIcon({ className = "" }: { className?: string }) {
+export function ChevronRightIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -59,14 +66,14 @@ export function ChevronRightIcon({ className = "" }: { className?: string }) {
       strokeWidth="3"
       strokeLinecap="square"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M9 6L15 12L9 18" />
     </svg>
   );
 }
 
-export function CloseIcon({ className = "" }: { className?: string }) {
+export function CloseIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -75,33 +82,33 @@ export function CloseIcon({ className = "" }: { className?: string }) {
       strokeWidth="3"
       strokeLinecap="square"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M6 6L18 18M6 18L18 6" />
     </svg>
   );
 }
 
-export function EditIcon({ className = "" }: { className?: string }) {
+export function EditIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M16.5 3.5L20.5 7.5L7.5 20.5H3.5V16.5L16.5 3.5Z" />
     </svg>
   );
 }
 
-export function DeleteIcon({ className = "" }: { className?: string }) {
+export function DeleteIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="currentColor"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M6 6H18V20H6V6Z" />
       <path d="M4 6H20V4H4V6Z" />
@@ -110,7 +117,7 @@ export function DeleteIcon({ className = "" }: { className?: string }) {
   );
 }
 
-export function PlusIcon({ className = "" }: { className?: string }) {
+export function PlusIcon({ className = "", style }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -119,7 +126,7 @@ export function PlusIcon({ className = "" }: { className?: string }) {
       strokeWidth="3"
       strokeLinecap="square"
       className={className}
-      style={{ width: '1em', height: '1em' }}
+      style={{ width: '1em', height: '1em', ...style }}
     >
       <path d="M12 5V19M5 12H19" />
     </svg>

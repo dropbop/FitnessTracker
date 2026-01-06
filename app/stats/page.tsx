@@ -52,60 +52,132 @@ export default function StatsPage() {
     <div>
       {/* Demo Mode Banner */}
       {mode === 'demo' && (
-        <div className="demo-banner mb-4 p-3 text-center">
+        <div className="demo-banner mb-3 p-2 text-center">
+          <span style={{ marginRight: '8px' }}>⚠️</span>
           DEMO MODE — SHOWING SAMPLE DATA
         </div>
       )}
 
-      <h1
-        className="text-3xl md:text-4xl mb-6"
-        style={{ color: 'var(--color-accent)', letterSpacing: '0.08em' }}
+      {/* Page Header - Forum style */}
+      <div
+        className="panel"
+        style={{ marginBottom: '16px' }}
       >
-        {YEAR} STATS
-      </h1>
+        <div
+          className="panel-header"
+          style={{
+            borderTop: '3px solid var(--color-vb-blue)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          <span style={{ fontSize: '14px' }}>📊</span>
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'var(--size-2xl)',
+              color: 'var(--color-accent-orange)',
+              letterSpacing: '2px',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(255,102,0,0.3)',
+            }}
+          >
+            {YEAR} STATS
+          </span>
+        </div>
 
-      {loading ? (
-        <p style={{ color: 'var(--color-text-muted)' }}>Loading...</p>
-      ) : (
-        <>
-          {/* Summary */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="panel p-4 text-center" style={{ borderTop: '3px solid #cc0000' }}>
+        <div className="panel-body">
+          {loading ? (
+            <p
+              style={{
+                color: 'var(--color-text-muted)',
+                fontFamily: 'var(--font-body)',
+                fontSize: 'var(--size-md)',
+              }}
+            >
+              Loading stats...
+            </p>
+          ) : (
+            /* Summary Stats - Forum widget style */
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+              {/* Lifting Stats */}
               <div
-                className="text-4xl"
-                style={{ color: '#cc0000', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
+                style={{
+                  backgroundColor: 'var(--color-bg-light)',
+                  border: '1px solid var(--color-border)',
+                  borderTop: '3px solid var(--color-lifting)',
+                  borderRadius: '3px',
+                  padding: '12px',
+                  textAlign: 'center',
+                }}
               >
-                {liftingCount}
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--size-3xl)',
+                    color: 'var(--color-lifting)',
+                    letterSpacing: '2px',
+                  }}
+                >
+                  {liftingCount}
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--size-xs)',
+                    color: 'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    marginTop: '4px',
+                  }}
+                >
+                  Lifting Entries
+                </div>
               </div>
+
+              {/* Cardio Stats */}
               <div
-                className="uppercase tracking-wider text-sm mt-1"
-                style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
+                style={{
+                  backgroundColor: 'var(--color-bg-light)',
+                  border: '1px solid var(--color-border)',
+                  borderTop: '3px solid var(--color-cardio)',
+                  borderRadius: '3px',
+                  padding: '12px',
+                  textAlign: 'center',
+                }}
               >
-                Lifting Entries
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--size-3xl)',
+                    color: 'var(--color-cardio)',
+                    letterSpacing: '2px',
+                  }}
+                >
+                  {cardioCount}
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--size-xs)',
+                    color: 'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    marginTop: '4px',
+                  }}
+                >
+                  Cardio Entries
+                </div>
               </div>
             </div>
-            <div className="panel p-4 text-center" style={{ borderTop: '3px solid #ffcc00' }}>
-              <div
-                className="text-4xl"
-                style={{ color: '#ffcc00', fontFamily: 'var(--font-heading)', letterSpacing: '0.05em' }}
-              >
-                {cardioCount}
-              </div>
-              <div
-                className="uppercase tracking-wider text-sm mt-1"
-                style={{ color: 'var(--color-text-muted)', fontFamily: 'var(--font-heading)' }}
-              >
-                Cardio Entries
-              </div>
-            </div>
-          </div>
+          )}
+        </div>
+      </div>
 
-          {/* Heatmaps */}
-          <div className="space-y-6">
-            <Heatmap entries={entries} category="lifting" year={YEAR} />
-            <Heatmap entries={entries} category="cardio" year={YEAR} />
-          </div>
-        </>
+      {/* Heatmaps */}
+      {!loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <Heatmap entries={entries} category="lifting" year={YEAR} />
+          <Heatmap entries={entries} category="cardio" year={YEAR} />
+        </div>
       )}
     </div>
   );
