@@ -31,3 +31,24 @@ CREATE TABLE exercise_metadata (
 
 CREATE INDEX idx_metadata_exercise ON exercise_metadata(exercise_name);
 CREATE INDEX idx_metadata_category ON exercise_metadata(category);
+
+-- Compound tracker tables (for half-life dose calculations)
+CREATE TABLE compounds (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  half_life DECIMAL NOT NULL,  -- in days
+  start_date DATE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE compound_doses (
+  id SERIAL PRIMARY KEY,
+  compound_id INTEGER REFERENCES compounds(id) ON DELETE CASCADE,
+  dose_date DATE NOT NULL,
+  dose_amount DECIMAL NOT NULL DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(compound_id, dose_date)
+);
+
+CREATE INDEX idx_compound_doses_compound ON compound_doses(compound_id);
+CREATE INDEX idx_compound_doses_date ON compound_doses(dose_date);

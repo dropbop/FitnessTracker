@@ -43,3 +43,39 @@ export interface CreateExerciseMetadataInput {
   category: ExerciseCategory;
   targets: string[];
 }
+
+// Compound tracker types
+export interface Compound {
+  id: number;
+  name: string;
+  half_life: number;
+  start_date: string;
+  created_at: string;
+}
+
+export interface CreateCompoundInput {
+  name: string;
+  half_life: number;
+  start_date: string;
+}
+
+export interface CompoundDose {
+  id: number;
+  compound_id: number;
+  dose_date: string;
+  dose_amount: number;
+  created_at: string;
+}
+
+export interface CreateCompoundDoseInput {
+  dose_date: string;
+  dose_amount: number;
+}
+
+export interface CalculatedDoseRow {
+  date: string;
+  index: number;
+  activeDose: number;
+  calculatedNext: number;
+  addedDose: number;
+}
