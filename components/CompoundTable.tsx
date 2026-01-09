@@ -90,7 +90,7 @@ export default function CompoundTable({ data, onDoseChange }: CompoundTableProps
               }}
             >
               <td style={cellStyle}>
-                {format(parseISO(row.date), 'MMM d, yyyy')}
+                {format(parseISO(row.date), 'EEE, MMM d')}
               </td>
               <td style={{ ...cellStyle, textAlign: 'center' }}>
                 {row.index}
