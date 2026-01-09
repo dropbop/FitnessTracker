@@ -79,7 +79,7 @@ export default function DoseChart({ data, compoundName }: DoseChartProps) {
             labelStyle={{ color: 'var(--color-text-primary)' }}
             itemStyle={{ color: 'var(--color-vb-blue-light)' }}
             labelFormatter={(value) => format(parseISO(value as string), 'MMM d, yyyy')}
-            formatter={(value: number) => [value.toFixed(2), 'Active Dose']}
+            formatter={(value) => [(value as number)?.toFixed(2) ?? '0', 'Active Dose']}
           />
           <ReferenceLine y={0} stroke="var(--color-border)" />
           <Line
