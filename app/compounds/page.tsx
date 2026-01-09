@@ -59,6 +59,7 @@ export default function CompoundsPage() {
   const [doses, setDoses] = useState<CompoundDose[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingCompound, setEditingCompound] = useState<Compound | null>(null);
+  const [futureDays, setFutureDays] = useState(30);
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -186,12 +187,16 @@ export default function CompoundsPage() {
     }
   };
 
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const endDate = useMemo(() => {
+    const future = new Date();
+    future.setDate(future.getDate() + futureDays);
+    return format(future, 'yyyy-MM-dd');
+  }, [futureDays]);
 
   const calculatedData = useMemo(() => {
     if (!selectedCompound) return [];
-    return calculateDoses(selectedCompound.start_date, selectedCompound.half_life, doses, today);
-  }, [selectedCompound, doses, today]);
+    return calculateDoses(selectedCompound.start_date, selectedCompound.half_life, doses, endDate);
+  }, [selectedCompound, doses, endDate]);
 
   // Require login
   if (!loading && mode === 'demo') {
@@ -428,16 +433,50 @@ export default function CompoundsPage() {
             >
               {selectedCompound.name.toUpperCase()}
             </span>
-            <span
+            <div
               style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: 'var(--size-sm)',
-                color: 'var(--color-text-muted)',
                 marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
               }}
             >
-              Half-life: {selectedCompound.half_life} days
-            </span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: 'var(--size-sm)',
+                  color: 'var(--color-text-muted)',
+                }}
+              >
+                t½: {selectedCompound.half_life}d
+              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <label
+                  style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: 'var(--size-xs)',
+                    color: 'var(--color-text-muted)',
+                  }}
+                >
+                  Forecast:
+                </label>
+                <select
+                  value={futureDays}
+                  onChange={(e) => setFutureDays(parseInt(e.target.value))}
+                  style={{
+                    padding: '2px 6px',
+                    fontSize: 'var(--size-xs)',
+                    width: 'auto',
+                  }}
+                >
+                  <option value={7}>7 days</option>
+                  <option value={14}>14 days</option>
+                  <option value={30}>30 days</option>
+                  <option value={60}>60 days</option>
+                  <option value={90}>90 days</option>
+                </select>
+              </div>
+            </div>
           </div>
           <div className="panel-body">
             {/* Chart */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { CalculatedDoseRow } from '@/lib/types';
 import { format, parseISO } from 'date-fns';
 
@@ -18,37 +18,27 @@ export default function CompoundTable({ data, onDoseChange }: CompoundTableProps
     setEditValue(row.addedDose > 0 ? row.addedDose.toString() : '');
   };
 
-  const handleEditSave = useCallback(() => {
+  const handleEditSave = () => {
     if (editingDate) {
       const amount = parseFloat(editValue) || 0;
       onDoseChange(editingDate, amount);
       setEditingDate(null);
       setEditValue('');
     }
-  }, [editingDate, editValue, onDoseChange]);
+  };
+
+  const handleEditCancel = () => {
+    setEditingDate(null);
+    setEditValue('');
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleEditSave();
     } else if (e.key === 'Escape') {
-      setEditingDate(null);
-      setEditValue('');
+      handleEditCancel();
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('.dose-input-cell')) {
-        if (editingDate) {
-          handleEditSave();
-        }
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [editingDate, handleEditSave]);
 
   if (data.length === 0) {
     return (
@@ -113,22 +103,58 @@ export default function CompoundTable({ data, onDoseChange }: CompoundTableProps
               </td>
               <td style={{ ...cellStyle, textAlign: 'right' }} className="dose-input-cell">
                 {editingDate === row.date ? (
-                  <input
-                    type="number"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    autoFocus
-                    step="any"
-                    min="0"
-                    style={{
-                      width: '70px',
-                      padding: '2px 4px',
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 'var(--size-sm)',
-                      textAlign: 'right',
-                    }}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '4px' }}>
+                    <input
+                      type="number"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      autoFocus
+                      step="any"
+                      min="0"
+                      style={{
+                        width: '60px',
+                        padding: '2px 4px',
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: 'var(--size-sm)',
+                        textAlign: 'right',
+                      }}
+                    />
+                    <button
+                      onClick={handleEditSave}
+                      title="Save (Enter)"
+                      style={{
+                        background: 'var(--color-accent-green)',
+                        border: '1px solid #000',
+                        borderRadius: '2px',
+                        padding: '2px 6px',
+                        color: '#000',
+                        fontWeight: 'bold',
+                        fontSize: 'var(--size-sm)',
+                        cursor: 'pointer',
+                        lineHeight: 1,
+                      }}
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={handleEditCancel}
+                      title="Cancel (Esc)"
+                      style={{
+                        background: 'var(--color-accent-red)',
+                        border: '1px solid #000',
+                        borderRadius: '2px',
+                        padding: '2px 6px',
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        fontSize: 'var(--size-sm)',
+                        cursor: 'pointer',
+                        lineHeight: 1,
+                      }}
+                    >
+                      ✗
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => handleEditStart(row)}
