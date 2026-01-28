@@ -11,11 +11,42 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { CalculatedDoseRow } from '@/lib/types';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isToday } from 'date-fns';
 
 interface DoseChartProps {
   data: CalculatedDoseRow[];
   compoundName: string;
+}
+
+function CustomTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: CalculatedDoseRow }>; label?: string }) {
+  if (!active || !payload || !payload.length) return null;
+
+  const row = payload[0].payload;
+
+  return (
+    <div
+      style={{
+        backgroundColor: 'var(--color-bg-lighter)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '3px',
+        fontFamily: 'var(--font-body)',
+        fontSize: '11px',
+        padding: '8px 10px',
+      }}
+    >
+      <div style={{ color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+        {format(parseISO(label as string), 'MMM d, yyyy')}
+      </div>
+      <div style={{ color: 'var(--color-vb-blue-light)' }}>
+        Active Dose: {row.activeDose.toFixed(2)}
+      </div>
+      {row.addedDose > 0 && (
+        <div style={{ color: 'var(--color-accent-orange)' }}>
+          Added Dose: {row.addedDose.toFixed(2)}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function DoseChart({ data, compoundName }: DoseChartProps) {
@@ -68,26 +99,27 @@ export default function DoseChart({ data, compoundName }: DoseChartProps) {
             domain={[0, yAxisMax]}
             width={45}
           />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: 'var(--color-bg-lighter)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '3px',
-              fontFamily: 'var(--font-body)',
-              fontSize: '11px',
-            }}
-            labelStyle={{ color: 'var(--color-text-primary)' }}
-            itemStyle={{ color: 'var(--color-vb-blue-light)' }}
-            labelFormatter={(value) => format(parseISO(value as string), 'MMM d, yyyy')}
-            formatter={(value) => [(value as number)?.toFixed(2) ?? '0', 'Active Dose']}
-          />
+          <Tooltip content={<CustomTooltip />} />
           <ReferenceLine y={0} stroke="var(--color-border)" />
           <Line
             type="monotone"
             dataKey="activeDose"
             stroke="var(--color-vb-blue)"
             strokeWidth={2}
-            dot={{ fill: 'var(--color-vb-blue)', strokeWidth: 0, r: 3 }}
+            dot={(props: { cx?: number; cy?: number; payload?: CalculatedDoseRow }) => {
+              const { cx, cy, payload } = props;
+              if (cx === undefined || cy === undefined || !payload) return null;
+              const isTodayDot = isToday(parseISO(payload.date));
+              return (
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={isTodayDot ? 5 : 3}
+                  fill={isTodayDot ? 'var(--color-accent-orange)' : 'var(--color-vb-blue)'}
+                  strokeWidth={0}
+                />
+              );
+            }}
             activeDot={{ fill: 'var(--color-accent-orange)', strokeWidth: 0, r: 5 }}
             name={compoundName}
           />
