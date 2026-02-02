@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { ExerciseEntry } from '@/lib/types';
-import { DEMO_ENTRIES } from '@/lib/demoData';
+import { getInitialDemoEntries } from '@/lib/demoData';
 import Heatmap from '@/components/Heatmap';
 
-const YEAR = 2026;
+const YEAR = new Date().getFullYear();
 
 type AppMode = 'demo' | 'real';
 
@@ -33,13 +33,13 @@ export default function StatsPage() {
         }
       } else {
         // Demo mode - use demo entries
-        setEntries(DEMO_ENTRIES);
+        setEntries(getInitialDemoEntries());
       }
     } catch (error) {
       console.error('Failed to fetch:', error);
       // Fall back to demo mode
       setMode('demo');
-      setEntries(DEMO_ENTRIES);
+      setEntries(getInitialDemoEntries());
     } finally {
       setLoading(false);
     }
