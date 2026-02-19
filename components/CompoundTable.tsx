@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { CalculatedDoseRow } from '@/lib/types';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isToday } from 'date-fns';
 
 interface CompoundTableProps {
   data: CalculatedDoseRow[];
@@ -12,6 +12,13 @@ interface CompoundTableProps {
 export default function CompoundTable({ data, onDoseChange }: CompoundTableProps) {
   const [editingDate, setEditingDate] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
+  const todayRef = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    if (todayRef.current) {
+      todayRef.current.scrollIntoView({ block: 'center' });
+    }
+  }, [data]);
 
   const handleEditStart = (row: CalculatedDoseRow) => {
     setEditingDate(row.date);
@@ -81,15 +88,25 @@ export default function CompoundTable({ data, onDoseChange }: CompoundTableProps
           </tr>
         </thead>
         <tbody>
-          {data.map((row, idx) => (
+          {data.map((row, idx) => {
+            const isTodayRow = isToday(parseISO(row.date));
+            return (
             <tr
               key={row.date}
+              ref={isTodayRow ? todayRef : undefined}
               style={{
-                background: idx % 2 === 0 ? 'var(--color-bg-lighter)' : 'var(--color-bg-light)',
+                background: isTodayRow
+                  ? 'rgba(255, 102, 0, 0.15)'
+                  : idx % 2 === 0 ? 'var(--color-bg-lighter)' : 'var(--color-bg-light)',
                 borderBottom: '1px solid var(--color-border)',
+                borderLeft: isTodayRow ? '3px solid var(--color-accent-orange)' : undefined,
               }}
             >
-              <td style={cellStyle}>
+              <td style={{
+                ...cellStyle,
+                color: isTodayRow ? 'var(--color-accent-orange)' : cellStyle.color,
+                fontWeight: isTodayRow ? 'bold' : undefined,
+              }}>
                 {format(parseISO(row.date), 'EEE, MMM d')}
               </td>
               <td style={{ ...cellStyle, textAlign: 'center' }}>
@@ -176,7 +193,8 @@ export default function CompoundTable({ data, onDoseChange }: CompoundTableProps
                 )}
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
